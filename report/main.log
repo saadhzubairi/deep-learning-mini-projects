@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.10.13)  15 AUG 2025 00:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.10.13)  15 AUG 2025 00:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -514,37 +514,37 @@ Package hyperref Info: Link coloring OFF on input line 22.
 \@outlinefile=\write4
 \openout4 = `main.out'.
 
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 34.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 33.
  (C:\Users\saadh\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 34.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 33.
  (C:\Users\saadh\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-Underfull \hbox (badness 6758) in paragraph at lines 37--38
+Underfull \hbox (badness 6758) in paragraph at lines 36--37
 []\OT1/ptm/m/n/9 We sys-tem-at-i-cally ex-plore Low[]Rank Adap-ta-tion
  []
 
 
-Underfull \hbox (badness 1048) in paragraph at lines 44--45
+Underfull \hbox (badness 1048) in paragraph at lines 43--44
 []\OT1/ptm/m/n/10 While fully fine-tuning large pre-trained mod-els like
  []
 
 
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 59--60
+Underfull \hbox (badness 10000) in paragraph at lines 58--59
 []\OT1/ptm/b/n/10 Target Mod-ules: \OT1/ptm/m/n/10 At-ten-tion pro-jec-tions (\OT1/pcr/m/n/10 q[]proj\OT1/ptm/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 2662) in paragraph at lines 59--60
+Underfull \hbox (badness 2662) in paragraph at lines 58--59
 \OT1/pcr/m/n/10 k[]proj\OT1/ptm/m/n/10 , \OT1/pcr/m/n/10 v[]proj\OT1/ptm/m/n/10 , \OT1/pcr/m/n/10 out[]proj\OT1/ptm/m/n/10 ) and op-tion-ally FFN
  []
 
 
-Underfull \hbox (badness 6348) in paragraph at lines 60--61
+Underfull \hbox (badness 6348) in paragraph at lines 59--60
 []\OT1/ptm/b/n/10 Classifier Head: \OT1/ptm/m/n/10 Adapt-ing the clas-si-fier (\OT1/pcr/m/n/10 dense\OT1/ptm/m/n/10 ,
  []
 
@@ -555,42 +555,42 @@ Underfull \hbox (badness 6348) in paragraph at lines 60--61
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 78--79
+Underfull \hbox (badness 10000) in paragraph at lines 77--78
 []\OT1/ptm/b/n/10 Feed-Forward Lay-ers: \OT1/ptm/m/n/10 Ap-ply-ing LoRA to the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 78--79
+Underfull \hbox (badness 10000) in paragraph at lines 77--78
 \OT1/pcr/m/n/10 intermediate.dense \OT1/ptm/m/n/10 and \OT1/pcr/m/n/10 output.dense
  []
 
 
-Underfull \hbox (badness 2134) in paragraph at lines 78--79
+Underfull \hbox (badness 2134) in paragraph at lines 77--78
 \OT1/ptm/m/n/10 the in-ter-nal struc-ture and nu-anced mean-ings within
  []
 
 
-Underfull \hbox (badness 1194) in paragraph at lines 85--86
+Underfull \hbox (badness 1194) in paragraph at lines 84--85
 \OT1/ptm/m/n/10 We se-lected AdamW as the pri-mary op-ti-mizer due to
  []
 
 
-Underfull \hbox (badness 1769) in paragraph at lines 85--86
+Underfull \hbox (badness 1769) in paragraph at lines 84--85
 \OT1/ptm/m/n/10 tuning, com-bin-ing adap-tive gradient-based op-ti-miza-tion
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 92--93
+Underfull \hbox (badness 10000) in paragraph at lines 91--92
 []\OT1/ptm/b/n/10 Dropout: \OT1/ptm/m/n/10 Im-ple-mented con-sis-tently within LoRA
  []
 
 
-Underfull \hbox (badness 3019) in paragraph at lines 92--93
+Underfull \hbox (badness 3019) in paragraph at lines 91--92
 \OT1/ptm/m/n/10 adapters and the clas-si-fier head, dropout ran-domly
  []
 
 
-Underfull \hbox (badness 6204) in paragraph at lines 92--93
+Underfull \hbox (badness 6204) in paragraph at lines 91--92
 \OT1/ptm/m/n/10 ro-bust-ness by pre-vent-ing over-reliance on spe-cific
  []
 
@@ -599,87 +599,87 @@ Underfull \hbox (badness 6204) in paragraph at lines 92--93
 
 
 [2]
-<images/baseline.png, id=101, 859.2903pt x 715.473pt>
+<images/baseline.png, id=100, 859.2903pt x 715.473pt>
 File: images/baseline.png Graphic file (type png)
 <use images/baseline.png>
-Package pdftex.def Info: images/baseline.png  used on input line 131.
+Package pdftex.def Info: images/baseline.png  used on input line 130.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
-<images/model_2.png, id=103, 859.2903pt x 715.473pt>
+<images/model_2.png, id=102, 859.2903pt x 715.473pt>
 File: images/model_2.png Graphic file (type png)
 <use images/model_2.png>
-Package pdftex.def Info: images/model_2.png  used on input line 137.
+Package pdftex.def Info: images/model_2.png  used on input line 136.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
-<images/model_3.png, id=104, 859.2903pt x 715.473pt>
+<images/model_3.png, id=103, 859.2903pt x 715.473pt>
 File: images/model_3.png Graphic file (type png)
 <use images/model_3.png>
-Package pdftex.def Info: images/model_3.png  used on input line 144.
+Package pdftex.def Info: images/model_3.png  used on input line 143.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
 
-Underfull \hbox (badness 1253) in paragraph at lines 151--152
+Underfull \hbox (badness 1253) in paragraph at lines 150--151
 \OT1/ptm/m/n/10 eval-u-ated al-ter-na-tive op-ti-miza-tion ap-proaches, in-clud-ing
  []
 
 
-Underfull \hbox (badness 1622) in paragraph at lines 151--152
+Underfull \hbox (badness 1622) in paragraph at lines 150--151
 \OT1/ptm/m/n/10 (max-i-mum val-i-da-tion ac-cu-racy of 94.58%), con-firm-ing
  []
 
 
-Underfull \hbox (badness 1661) in paragraph at lines 158--159
+Underfull \hbox (badness 1661) in paragraph at lines 157--158
 \OT1/ptm/m/n/10 ules [query, value, clas-si-fier.dense, clas-si-fier.out[]proj]
  []
 
 
 
 
-Underfull \hbox (badness 1033) in paragraph at lines 161--162
+Underfull \hbox (badness 1033) in paragraph at lines 160--161
 \OT1/ptm/m/n/10 val-i-da-tion and gen-er-al-iza-tion per-for-mance. This de-cline
  []
 
 
-Underfull \hbox (badness 1917) in paragraph at lines 161--162
+Underfull \hbox (badness 1917) in paragraph at lines 160--161
 \OT1/ptm/m/n/10 was par-tic-u-larly pro-nounced when adap-ta-tion was ap-
  []
 
 
-Underfull \hbox (badness 1052) in paragraph at lines 161--162
+Underfull \hbox (badness 1052) in paragraph at lines 160--161
 \OT1/ptm/m/n/10 plied to clas-si-fier com-po-nents, sup-port-ing the hy-poth-e-
  []
 
-<images/model_4.png, id=106, 859.2903pt x 715.473pt>
+<images/model_4.png, id=105, 859.2903pt x 715.473pt>
 File: images/model_4.png Graphic file (type png)
 <use images/model_4.png>
-Package pdftex.def Info: images/model_4.png  used on input line 167.
+Package pdftex.def Info: images/model_4.png  used on input line 166.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
-<images/model_5.png, id=107, 859.2903pt x 715.473pt>
+<images/model_5.png, id=106, 859.2903pt x 715.473pt>
 File: images/model_5.png Graphic file (type png)
 <use images/model_5.png>
-Package pdftex.def Info: images/model_5.png  used on input line 174.
+Package pdftex.def Info: images/model_5.png  used on input line 173.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
-<images/model_6.png, id=108, 859.2903pt x 715.473pt>
+<images/model_6.png, id=107, 859.2903pt x 715.473pt>
 File: images/model_6.png Graphic file (type png)
 <use images/model_6.png>
-Package pdftex.def Info: images/model_6.png  used on input line 180.
+Package pdftex.def Info: images/model_6.png  used on input line 179.
 (pdftex.def)             Requested size: 75.8804pt x 63.17798pt.
 
-Underfull \hbox (badness 2717) in paragraph at lines 181--181
+Underfull \hbox (badness 2717) in paragraph at lines 180--180
 \OT1/ptm/m/n/9 tion, and Clas-si-fier
  []
 
 
-Underfull \hbox (badness 2781) in paragraph at lines 195--196
+Underfull \hbox (badness 2781) in paragraph at lines 194--195
 []\OT1/ptm/m/n/10 These ex-per-i-ments con-trast two com-ple-men-tary ap-
  []
 
 
-Underfull \hbox (badness 2326) in paragraph at lines 198--220
+Underfull \hbox (badness 2326) in paragraph at lines 197--219
 \OT1/ptm/m/n/10 Our sys-tem-atic ex-plo-ration of parameter-efficient fine-
  []
 
 
 
 [3 <./images/baseline.png> <./images/model_2.png> <./images/model_3.png> <./images/model_4.png> <./images/model_5.png> <./images/model_6.png>]
-Underfull \hbox (badness 1117) in paragraph at lines 228--229
+Underfull \hbox (badness 1117) in paragraph at lines 227--228
 []\OT1/ptm/m/n/10 Our ex-per-i-ments demon-strate that which mod-ules to
  []
 
@@ -714,15 +714,15 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  22561 strings out of 473899
  430949 string characters out of 5726499
- 820284 words of memory out of 5000000
+ 820285 words of memory out of 5000000
  45024 multiletter control sequences out of 15000+600000
  577993 words of font info for 74 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,12n,93p,650b,585s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (5 pages, 580486 bytes).
+Output written on main.pdf (5 pages, 579800 bytes).
 PDF statistics:
- 203 PDF objects out of 1000 (max. 8388607)
+ 202 PDF objects out of 1000 (max. 8388607)
  47 named destinations out of 1000 (max. 500000)
  123 words of extra memory for PDF output out of 10000 (max. 10000000)
 
