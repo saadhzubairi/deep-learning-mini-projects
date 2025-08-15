@@ -1,0 +1,88 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Cubuk \bgroup et al\mbox.\egroup
+  }{2020}]{cubuk2020randaugment}
+Cubuk, E.~D.; Zoph, B.; Shlens, J.; and Le, Q.~V.
+\newblock 2020.
+\newblock Randaugment: Practical automated data augmentation with a reduced
+  search space.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition Workshops},  702--703.
+
+\bibitem[\protect\citeauthoryear{He \bgroup et al\mbox.\egroup
+  }{2015}]{he2015deep}
+He, K.; Zhang, X.; Ren, S.; and Sun, J.
+\newblock 2015.
+\newblock Deep residual learning for image recognition.
+\newblock {\em arXiv preprint arXiv:1512.03385}.
+\newblock Submitted on 10 Dec 2015.
+
+\bibitem[\protect\citeauthoryear{Hu, Shen, and Sun}{2018}]{hu2018squeeze}
+Hu, J.; Shen, L.; and Sun, G.
+\newblock 2018.
+\newblock Squeeze-and-excitation networks.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition},  7132--7141.
+
+\bibitem[\protect\citeauthoryear{Huang \bgroup et al\mbox.\egroup
+  }{2016}]{huang2016deep}
+Huang, G.; Sun, Y.; Liu, Z.; Sedra, D.; and Weinberger, K.~Q.
+\newblock 2016.
+\newblock Deep networks with stochastic depth.
+\newblock In {\em European Conference on Computer Vision},  646--661.
+
+\bibitem[\protect\citeauthoryear{Izmailov \bgroup et al\mbox.\egroup
+  }{2018}]{izmailov2018averaging}
+Izmailov, P.; Podoprikhin, D.; Garipov, T.; Vetrov, D.; and Wilson, A.~G.
+\newblock 2018.
+\newblock Averaging weights leads to wider optima and better generalization.
+\newblock In {\em Proceedings of the International Conference on Machine
+  Learning}.
+
+\bibitem[\protect\citeauthoryear{Loshchilov and
+  Hutter}{2017}]{loshchilov2016sgdr}
+Loshchilov, I., and Hutter, F.
+\newblock 2017.
+\newblock Sgdr: Stochastic gradient descent with warm restarts.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[\protect\citeauthoryear{Loshchilov and
+  Hutter}{2019}]{loshchilov2019decoupled}
+Loshchilov, I., and Hutter, F.
+\newblock 2019.
+\newblock Decoupled weight decay regularization.
+\newblock {\em arXiv preprint arXiv:1711.05101}.
+
+\bibitem[\protect\citeauthoryear{Szegedy \bgroup et al\mbox.\egroup
+  }{2016}]{szegedy2016rethinking}
+Szegedy, C.; Vanhoucke, V.; Ioffe, S.; Shlens, J.; and Wojna, Z.
+\newblock 2016.
+\newblock Rethinking the inception architecture for computer vision.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition},  2818--2826.
+
+\bibitem[\protect\citeauthoryear{Yun \bgroup et al\mbox.\egroup
+  }{2019}]{yun2019cutmix}
+Yun, S.; Han, D.; Oh, S.~J.; Chun, S.; Choe, J.; and Yoo, Y.
+\newblock 2019.
+\newblock Cutmix: Regularization strategy to train strong classifiers with
+  localizable features.
+\newblock In {\em Proceedings of the IEEE International Conference on Computer
+  Vision},  6023--6032.
+
+\bibitem[\protect\citeauthoryear{Zhang \bgroup et al\mbox.\egroup
+  }{2018}]{zhang2018mixup}
+Zhang, H.; Cisse, M.; Dauphin, Y.~N.; and Lopez-Paz, D.
+\newblock 2018.
+\newblock mixup: Beyond empirical risk minimization.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[\protect\citeauthoryear{Zhong \bgroup et al\mbox.\egroup
+  }{2017}]{zhong2017random}
+Zhong, Z.; Zheng, L.; Li, G.; Zhou, S.; Li, S.; and Yang, Y.
+\newblock 2017.
+\newblock Random erasing data augmentation.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~31,  13001--13008.
+
+\end{thebibliography}
