@@ -1,4 +1,4 @@
-
+%File: formatting-instruction.tex
 \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
@@ -6,236 +6,250 @@
 \usepackage{courier}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{subcaption}
 \usepackage{tikz}
+\usepackage[square,numbers,sort&compress]{natbib}
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta}
 \usepackage{hyperref}
-
-
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
 \pdfinfo{
-  /Title (Residual Network Architecture with Dynamic Data Augmentation, Squeeze-and-Excitation, and Stochastic Weight Averaging for Robust CIFAR-10 Image Classification)
-  /Author (Humza, A., Zubairi, S.)
-  
-}
+/Title (Parameter-Efficient Fine-Tuning of RoBERTa using LoRA for Robust AGNews Classification)
+/Author (Ali Hamza, Saad Zubairi)}
 \setcounter{secnumdepth}{0}  
 
 \begin{document}
-\title{Residual Network Architecture with Dynamic Data Augmentation, Squeeze-and-Excitation, and Stochastic Weight Averaging for Robust CIFAR-10 Image Classification}
+
+\title{Parameter-Efficient Fine-Tuning of RoBERTa using LoRA for Robust AGNews Classification}
+
 \author{Hamza, A., \& Zubairi, S. \\
 Department of Electrical and Computer Engineering\\
 New York University Tandon School of Engineering\\
 \texttt{ah7072@nyu.edu | shz2020@nyu.edu}\\
-\href{https://github.com/hurryingauto3/ece-gy-7143-deeplearning/tree/main/project_1}{Github Repository} | \href{https://www.kaggle.com/code/hurryingauto3/notebookeb139646e3}{Kaggle Notebook}
+\url{https://github.com/hurryingauto3/ece-gy-7123-project-2}\\
+\url{https://www.kaggle.com/code/hurryingauto3/dl-project-2-4-21-1130}
 }
 \maketitle
+
 \begin{abstract}
-\begin{quote}
-We propose a compact ResNet for CIFAR‑10 that meets a 5M parameter constraint while achieving 95.31\% accuracy (Kaggle score 0.85485). Our design incorporates SE blocks, advanced regularization (dropout, label smoothing, stochastic depth), and dynamic data augmentation. A training strategy with warmup, cosine annealing, and SWA with BatchNorm freezing further optimizes performance.
-\end{quote}
-\end{abstract}
+    \begin{quote}
+    We systematically explore Low‑Rank Adaptation (LoRA) configurations, data augmentation, and regularization to fine‑tune RoBERTa‑base on AGNews under a 1 M–parameter budget. Our best model achieves 94.61 \% validation accuracy (loss 0.1704) with ~962 k trainable parameters but only a 0.8420 score on the hidden Kaggle test set, revealing a notable validation–generalization gap under strict constraints.
+    \end{quote}
+    \end{abstract}
+
 \section{Introduction}
-CIFAR‑10 is a common benchmark with 60,000 32×32 color images in 10 classes. ResNets, known for their skip connections, ease the training of deep models. Here, we modify a ResNet to meet a 5M parameter limit while achieving state‑of‑the‑art performance on CIFAR‑10 by combining architectural enhancements, robust regularization, and optimized training techniques.
+Text classification models deployed on resource-constrained devices or latency-sensitive applications demand efficiency in memory and computation. The standard AGNews corpus—comprising 120k training and 7.6k test samples across four categories (World, Sports, Business, Sci/Tech)—serves as a practical benchmark for evaluating models under such constraints.
+
+While fully fine-tuning large pre-trained models like RoBERTa-base (125M parameters) can achieve high accuracy (often $>$94\%) on this dataset, the associated computational and storage costs are prohibitive for many applications, limiting iterative development and on-device adaptation.
+
+Low-Rank Adaptation (LoRA)~\cite{hu2022lora} offers a compelling alternative by freezing the pre-trained weights and injecting small, trainable low-rank matrices into specific layers. This drastically reduces the number of trainable parameters needed for task adaptation. However, optimal configuration of LoRA (rank, target modules) combined with other training techniques (data handling, regularization) under a strict parameter budget (e.g., $<$1M) is often non-trivial and dataset-dependent.
+
+\subsection{Architecture}
+We adapt a pre-trained RoBERTa-base transformer (125M parameters) to the AGNews task using Low-Rank Adaptation (LoRA) within a 1M trainable parameter limit. LoRA introduces trainable low-rank matrices into selected weight matrices while freezing the original weights, updating parameters as:
+\[
+W' = W + \alpha AB
+\]
+where $A \in \mathbf{R}^{d \times r}$, $B \in \mathbf{R}^{r \times d}$, rank $r$ controls adaptation capacity, and scaling factor $\alpha$ modulates update magnitude without affecting parameter count.
+
+\paragraph{LoRA Parameterization:}
+Each adapter adds $2dr$ parameters per matrix. For RoBERTa-base ($d=768$), total parameter count depends on:
+\begin{itemize}
+    \item \textbf{Rank ($r$):} Increasing $r$ linearly scales parameters (one layer with all 6 modules adds $13,824\cdot r$ parameters).
+    \item \textbf{Target Modules:} Attention projections (\texttt{q\_proj}, \texttt{k\_proj}, \texttt{v\_proj}, \texttt{out\_proj}) and optionally FFN layers (\texttt{intermediate.dense}, \texttt{output.dense}).
+    \item \textbf{Classifier Head:} Adapting the classifier (\texttt{dense}, \texttt{out\_proj}) adds approximately $2,300\cdot r$ parameters, minimal compared to encoder layers.
+    \item \textbf{Layers Adapted:} Applying LoRA to all 12 encoder layers multiplies cost accordingly.
+\end{itemize}
+
+This structured approach ensures efficient adaptation of RoBERTa-base within strict parameter constraints while retaining substantial representational capacity.
 
 \section{Methodology}
-\subsection{Architecture}
-Our modified architecture builds upon a ResNet-18 foundation by enhancing its core residual block. In the traditional residual block, using the formulation \[ReLU(S(x)+F(x))\] as described in \cite{he2015deep} where S(x) is the identity skip connection and F(x) is a sequence of layers comprising a $3\times 3$ convolution, batch normalization, ReLU activation, followed by another $3\times 3$ convolution and batch normalization. In our design, we integrate Squeeze-and-Excitation (SE) blocks \cite{hu2018squeeze} immediately after the second convolution. These SE blocks perform global average pooling on the feature maps, then pass the resulting channel descriptors through a two-layer fully connected network (with a reduction ratio of 16) to learn channel-wise scaling factors. This adaptive recalibration of feature channels enhances representational power without significant parameter overhead.
 
-Furthermore, we experimented with different residual block configurations, ultimately selecting a (3,3,2,1) block structure. The network starts with an initial convolution that maps the input image to 32 channels and progressively increases the number of channels (to 64, then 128, and finally 256) while reducing spatial dimensions via striding. An adaptive average pooling layer then aggregates spatial features into a fixed-size representation, which is fed into a final fully connected layer for classification into 10 classes.
+We fine-tuned RoBERTa-base to achieve optimal validation accuracy and minimal validation loss within a strict 1M parameter limit, emphasizing generalization and robustness. We leveraged Low-Rank Adaptation (LoRA), complemented by various optimizers, schedulers, regularization, and data strategies, each selected based on established literature.
 
-This architectural design—combining a deeper block configuration, SE enhancements, and a balanced channel progression—enables the model to achieve high accuracy on CIFAR‑10 while remaining under the 5M parameter constraint.
+\subsection{LoRA Configuration} LoRA efficiently reduces trainable parameters by injecting low-rank updates into frozen pre-trained weights \cite{hu2022lora}. Configuring LoRA required careful tuning of rank ($r$), scaling factor ($\alpha$), and adapter placement.
 
-\begin{figure}[ht]
-\centering
-\resizebox{0.9\linewidth}{!}{%
-\begin{tikzpicture}[node distance=1.2cm, auto,
-    block/.style={rectangle, draw, text width=3.5cm, align=center, rounded corners, minimum height=1cm},
-    arrow/.style={-{Stealth}, thick}]
+\paragraph{Rank ($r$) and Scaling ($\alpha$):} Rank $r$ defines adapter capacity, directly influencing parameter count and expressivity \cite{hu2022lora}. Higher $r$ increases representational power but risks overfitting; lower $r$ supports parameter efficiency but may underfit. The scaling factor $\alpha$, proportional to $r$, stabilizes training dynamics by modulating update magnitude \cite{li2023lora}. We systematically explored ranks $r=2$ to $10$, adjusting $\alpha$ accordingly ranging from 12 to 32.
 
-% Nodes
-\node [block] (input) {Input\\$32\times32\times3$};
-\node [block, right=of input] (conv) {Conv3x3, 32 filters\\BN + ReLU};
-\node [block, right=of conv] (layer1) {Layer 1:\\3 Residual Blocks\\(with SE)\\Output: $32\times32\times64$};
-\node [block, right=of layer1] (layer2) {Layer 2:\\3 Residual Blocks, Stride=2\\(with SE)\\Output: $16\times16\times128$};
-\node [block, right=of layer2] (layer3) {Layer 3:\\2 Residual Blocks, Stride=2\\(with SE)\\Output: $8\times8\times256$};
-\node [block, right=of layer3] (layer4) {Layer 4:\\1 Residual Block, Stride=2\\(with SE)\\Output: $4\times4\times256$};
-\node [block, right=of layer4] (pool) {AdaptiveAvgPool2d\\$1\times1\times256$};
-\node [block, right=of pool] (fc) {Dropout\\FC: 256 $\rightarrow$ 10};
-\node [block, right=of fc] (output) {Output\\10 Classes};
+\paragraph{Adapter Placement:} LoRA adapters were strategically tested across critical modules to effectively utilize the limited parameter budget:
 
-% Arrows
-\draw [arrow] (input) -- (conv);
-\draw [arrow] (conv) -- (layer1);
-\draw [arrow] (layer1) -- (layer2);
-\draw [arrow] (layer2) -- (layer3);
-\draw [arrow] (layer3) -- (layer4);
-\draw [arrow] (layer4) -- (pool);
-\draw [arrow] (pool) -- (fc);
-\draw [arrow] (fc) -- (output);
-
-\end{tikzpicture}
-}
-\caption{Final Modified ResNet Architecture with SE Blocks: Feature extraction through successive convolutional and residual layers, followed by global pooling and a classification head.}
-\label{fig:resnet_architecture}
-\end{figure}
-
-\subsection{Training Methodology}
-
-Our training strategy was designed to maximize generalization while respecting a 5M parameter constraint. In this section, we detail our key design choices, including hyperparameter tuning, optimization, regularization, and data augmentation.
-
-\subsection{Hyperparameter Tuning}
-We extensively tuned the architectural and training hyperparameters:
 \begin{itemize}
-    \item \textbf{Block Configuration and Network Depth:} We experimented with several ResNet variants. Our best configuration was ResNet (3,3,2,1), which increases the number of channels gradually from a base of 32 up to 256. All convolutions used 3$\times$3 kernels.
-    \item \textbf{Channel and Kernel Sizes:} The network starts with 32 channels and progresses to 64, 128, and finally 256 channels, balancing expressiveness with parameter efficiency.
-    \item \textbf{Batch Size and Total Epochs:} We primarily used a batch size of 128 and varied the total training duration from 35 to 150 epochs. Extended training (up to 150 epochs) allowed for better convergence and fine-tuning.
+    \item \textbf{Attention Layers:} Adapting \texttt{q\_proj}, \texttt{k\_proj}, \texttt{v\_proj}, and \texttt{out\_proj} affects the model’s token-to-token interaction capabilities, enhancing context-specific feature extraction and attention mechanisms essential for capturing semantic relationships between words~\cite{vaswani2017attention}.
+    \item \textbf{Feed-Forward Layers:} Applying LoRA to the \texttt{intermediate.dense} and \texttt{output.dense} layers targets intra-token transformations, refining token-level feature representations that are crucial for modeling the internal structure and nuanced meanings within tokens~\cite{liu2019roberta}.
+    \item \textbf{Classifier Head:} Adapters on \texttt{classifier.dense} and \texttt{classifier.out\_proj} directly modulate the decision boundaries and label distributions, providing a focused and efficient adjustment of the model's final prediction outputs, particularly beneficial for fine-tuning to specific downstream tasks~\cite{kovaleva2019revealing}.
 \end{itemize}
 
-\subsection{Optimization}
-We evaluated different optimizers and learning rate strategies:
+Early-layer adaptation is theoretically crucial for effective domain adaptation, while classifier tuning directly influences decision boundaries \cite{howard2018universal}.
+
+\subsection{Optimizers and Learning Rate Scheduling}
+We selected AdamW as the primary optimizer due to its proven effectiveness in transformer-based model fine-tuning, combining adaptive gradient-based optimization with weight decay regularization to enhance convergence stability and generalization~\cite{loshchilov2017decoupled}. We evaluated alternative optimizers such as AdaGrad and RMSProp; however, neither demonstrated improvements over AdamW in terms of validation accuracy or training efficiency.
+
+For learning rate scheduling, we employed a linear decay scheduler with an initial warmup phase, which has consistently shown improved convergence stability and performance in transformer models by gradually adjusting the learning rate to mitigate early-stage instability~\cite{liu2019roberta}. Experiments with cosine annealing schedulers did not provide consistent or significant performance benefits compared to the linear schedule, validating our default choice.
+
+\subsection{Regularization Techniques}
+To enhance generalization and reduce the risk of overfitting within our constrained training regime, we applied targeted regularization methods:
 \begin{itemize}
-    \item \textbf{Optimizer Selection:} We compared SGD and AdamW. AdamW, \cite{loshchilov2019decoupled} with a learning rate of 0.003 and weight decay between 0.0007 and 0.00075, provided more stable convergence and superior generalization compared to SGD, which required a higher learning rate (around 0.01).
-    \item \textbf{Learning Rate Scheduling:} Our learning rate schedule combined a warmup phase using LinearLR (starting at a factor of 0.01 for 5 iterations) with cosine annealing \cite{loshchilov2016sgdr} implemented via SequentialLR. The cosine annealing phase used a $T_{\text{max}}$ between 50 and 80 epochs and decayed the learning rate to an $\eta_{\text{min}}$ of approximately $1\times10^{-5}$.
-    \item \textbf{Stochastic Weight Averaging (SWA):} To further enhance generalization, SWA \cite{izmailov2018averaging} was incorporated in the latter phase of training. Specifically, SWA was initiated at roughly 62.5\% of the total epochs (e.g., epoch 93 for a 150-epoch schedule) using an SWA learning rate between $3\times10^{-5}$ and $5\times10^{-5}$. This technique averages weights from multiple epochs to obtain a smoother, more robust final model.
+    \item \textbf{Dropout:} Implemented consistently within LoRA adapters and the classifier head, dropout randomly sets neurons to zero during training, promoting model robustness by preventing over-reliance on specific features~\cite{srivastava2014dropout}.
+    \item \textbf{Label Smoothing:} By smoothing target labels and distributing a small portion of the target probability across all classes, label smoothing discourages overly confident predictions, thus encouraging better-calibrated output probabilities and improved generalization to unseen data~\cite{szegedy2016rethinking}.
 \end{itemize}
 
-\subsection{Regularization and Loss Settings}
-To reduce overfitting, we applied multiple regularization techniques:
+\subsection{Data Augmentation and Filtering}
+To enhance robustness and generalization, we implemented dynamic textual augmentation methods inspired by successful strategies in both NLP and computer vision literature \cite{wei2019eda, cubuk2019autoaugment}. Specifically, we employed:
 \begin{itemize}
-    \item \textbf{Label Smoothing:}  \cite{szegedy2016rethinking} We experimented with label smoothing values of 0.0, 0.05, and 0.1. Label smoothing helps by softening the target labels and reducing the model's overconfidence.
-    \item \textbf{Dropout:} Dropout was applied in the fully connected layers with rates between 0.1 and 0.35, which forces the network to learn redundant representations.
-    \item \textbf{Stochastic Depth Dropout:} We incorporated stochastic depth dropout \cite{huang2016deep} (with probabilities of 0.0, 0.05, or 0.1) in the residual blocks. This technique randomly skips residual connections during training, encouraging the model to learn more robust features.
-    \item \textbf{Squeeze-and-Excitation (SE) Blocks:} SE blocks were integrated within each residual block. They perform global average pooling followed by a two-layer fully connected network (with a reduction ratio of 16) to produce channel-wise scaling factors. This mechanism allows the network to recalibrate channel responses adaptively with minimal parameter overhead.
+    \item \textbf{Synonym Replacement:} Randomly replacing selected words with their synonyms from WordNet introduces semantic diversity, thereby reducing the model's sensitivity to specific lexical choices and improving semantic generalization \cite{zhang2015character}.
+
+    \item \textbf{Word Dropout:} Randomly removing words simulates incomplete or noisy input, compelling the model to rely less on specific words and more on context, thus increasing its robustness to fragmented or partial text \cite{iyyer2015deep}.
+
+    \item \textbf{Random Swap:} Swapping the positions of two random words within a sentence helps simulate casual or informal writing variations, training the model to better handle grammatical inconsistencies common in real-world text data \cite{wei2019eda}.
+
+    \item \textbf{Character-level Noise Injection:} Introducing small perturbations (substitution, capitalization, deletion, swapping, and special character insertion) mimics typographical errors and casual user-generated text, significantly enhancing the model's resilience to minor textual corruptions \cite{belinkov2018synthetic}.
 \end{itemize}
 
-\subsection{Data Augmentation and Fine-Tuning}
-We adopted a dynamic data augmentation strategy to further improve generalization:
+Additionally, to improve dataset quality and reduce noise without sacrificing significant diversity, basic filtering techniques were applied:
 \begin{itemize}
-    \item \textbf{Early Training (Heavy Augmentation):} In the early phase, we used a heavy augmentation pipeline including:
-        \begin{itemize}
-            \item \textbf{RandAugment:} \cite{cubuk2020randaugment} Applied with 3 operations at a magnitude of 9.
-            \item \textbf{ColorJitter:} Adjusting brightness, contrast, and saturation by 0.2 and hue by 0.1.
-            \item \textbf{Random Erasing:} \cite{zhong2017random} With a probability of 0.1--0.2 to simulate occlusions.
-        \end{itemize}
-        In addition, we applied MixUp \cite{zhang2018mixup} and CutMix \cite{yun2019cutmix} augmentation:
-        \begin{itemize}
-            \item \textbf{MixUp:} Blending two images using a mixing coefficient sampled from a Beta distribution with an alpha value of 0.2 or 0.4.
-            \item \textbf{CutMix:} Replacing a region of one image with a patch from another, using an alpha value of 1.0.
-        \end{itemize}
-        These augmentations were applied with a 35\% probability during early epochs to promote robustness.
-    \item \textbf{Fine-Tuning Phase:} During the final 25\% of epochs, we transitioned to a lighter augmentation pipeline that consisted of basic random cropping, horizontal flipping, and normalization. Concurrently, the probability of applying MixUp/CutMix was reduced to 15\% to allow the model to refine its decision boundaries on less perturbed data. Furthermore, BatchNorm layers were frozen in the final epochs (starting around 87.5\% of total epochs) to stabilize normalization statistics.
+    \item \textbf{Text Length Filtering:} Samples exceeding 100 words were discarded, as excessively long texts might introduce noise or irrelevant details.
+    \item \textbf{Non-Alphanumeric Ratio Filtering:} Texts with excessive non-alphanumeric characters (often indicative of corrupted or malformed inputs) were removed to maintain dataset integrity and readability.
 \end{itemize}
-
-Together, these strategies enabled our modified ResNet to achieve high test accuracy on CIFAR-10 while remaining within the 5M parameter constraint. Each component—from architectural adjustments to the dynamic augmentation and SWA—played a crucial role in enhancing the model's generalization performance.
+These combined augmentation and filtering strategies systematically aimed at enhancing robustness and generalization of our model under strict computational constraints.
 
 \section{Iterative Model Improvements}
 
-From the original ResNet-18 architecture described in \cite{he2015deep}, we made several modifications to improve performance while adhering to a 5M parameter constraint. Our evolution can be summarized as follows:
+We conducted systematic experiments to optimize validation accuracy while maintaining fewer than 1 million trainable parameters. Each configuration provides insights into parameter-efficient fine-tuning of pretrained language models:
 
+\textbf{Baseline Model:} We applied LoRA adapters to attention components (query and value) of RoBERTa-base. With rank $r=8$ and scaling factor $\alpha=16$, this configuration achieved 94.34\% validation accuracy and a Kaggle score of 0.8418, while training only 888,580 parameters (0.71\% of total model parameters).
+\textbf{Parameter Scaling (Models 2-3):} We investigated the impact of increasing LoRA hyperparameters:
 \begin{enumerate}
-    \item \textbf{Model 1: Baseline.} Standard ResNet (2,2,2,2) with 2.7M parameters, trained using SGD (LR=0.01, WD=0.0005) and advanced augmentation (random cropping, flipping, ColorJitter). Minimal regularization yields 88.3\% accuracy (Kaggle: 0.76536). See Figure~\ref{fig:training_performance_8825}.
+    \item \textbf{Model 2: } Increasing rank to $r=10$ while maintaining $\alpha=16$ yielded modest improvement to 94.37\% validation accuracy with 962,308 parameters (0.77\%).
     
-    \begin{figure}[ht]
+    \item \textbf{Model 3 (Final Kaggle Submission):} Further increasing scaling factor to $\alpha=32$ produced our highest Kaggle score (0.8420) with 94.61\% validation accuracy, demonstrating effective generalization and robustness. This configuration maintained 962,308 parameters (0.77\%).
+\end{enumerate}
+These experiments revealed diminishing returns from parameter scaling alone, suggesting the need for structural innovations beyond simple capacity increases.
+\begin{figure}[h]
     \centering
-         \includegraphics[width=0.7\linewidth]{images/traintest_lost-88.25.png}
-    \caption{Train/test loss over 35 epochs (Model 1).}
-    \label{fig:training_performance_8825}
-    \end{figure}
-
-    \item \textbf{Model 2: Regularization Improvements.} Introducing label smoothing (0.05--0.1) and increasing dropout (up to 0.35) improves accuracy to 89.8\% (Kaggle: 0.78232).
-
-    \item \textbf{Model 3: Augmentation \& Architecture Change.} Switching to a ResNet (2,2,2,1) and applying MixUp and CutMix (35\% probability) with SWA starting after 30 epochs yields approximately 89.4\% accuracy (Kaggle: 0.77075).
-
-    \item \textbf{Model 5: Optimizer \& Tuning.} Using AdamW (LR=0.003, WD$\approx$0.0007–0.00075), reducing label smoothing (0.05), increasing dropout (0.35), and starting SWA earlier (after 25 epochs) raises accuracy to 92.70\% (Kaggle: 0.81584).
-
-    \item \textbf{Models 6--8: Minor Tweaks.} Further refinements—such as a deeper ResNet (3,3,2,1) with no label smoothing, moderate dropout (0.2), and fine-tuning with AdamW (LR=0.01)—yield accuracies of 93.18\% and 94.06\% (Kaggle: 0.82482 and 0.82621), which are combined in our narrative.
-
-    \item \textbf{Model 9: SE Blocks Integration.} Incorporating SE blocks (reduction ratio=16), reducing dropout (0.1), and maintaining label smoothing (0.1), with SWA starting after 50 epochs, increases accuracy to 94.62\% (Kaggle: 0.84497). See Figure~\ref{fig:training_performance_9462}.
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/baseline.png}
+        \caption{Baseline}
+        \label{fig:baseline}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/model_2.png}
+        \caption{Model 2}
+        \label{fig:model2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/model_3.png}
+        \caption{Model 3}
+        \label{fig:model3}
+    \end{subfigure}
+    \caption{Comparison of learning curves for Models 2 and 3}
+    \label{fig:rank-exp}
+\end{figure}
+\paragraph{Optimizer and Scheduler Variations (Models 4--6):} We evaluated alternative optimization approaches, including AdaGrad, RMSProp, and CosineAnnealingLR scheduling. These experiments yielded only marginal improvements (maximum validation accuracy of 94.58\%), confirming AdamW with linear scheduling as a robust default for LoRA fine-tuning so we did not pursue these further and did not include them in the final submission.
+\paragraph{Module Expansion and Classifier Adaptation (Models 7--9):} We explored architectural variations in LoRA application:
+\begin{enumerate}
+    \item \textbf{Model 7:} Expanding adaptation to [query, key, value, intermediate.dense, output.dense] with conservative hyperparameters ($r=2$, $\alpha=12$) achieved 94.87\% validation accuracy with 925,444 parameters (0.74\%) however Kaggle performance dropped to 0.2670. 
     
-    \begin{figure}[ht]
-    \centering
-         \includegraphics[scale=0.3]{images/train_test_loss_94.62.png}
-    \caption{Train/test loss over 80 epochs (Model 9).}
-    \label{fig:training_performance_9462}
-    \end{figure}
-
-    \item \textbf{Model 10: Final Model.} Extending training to 150 epochs, using lighter augmentation in the final 25\% (MixUp/CutMix probability reduced to 15\%), freezing BatchNorm layers in the final 10\% (from epoch 131), and starting SWA at 62.5\% (epoch 93) with SWA LR of $5\times10^{-4}$, the final model achieves 95.31\% accuracy (Kaggle: 0.85485). See Figure~\ref{fig:training_performance}.
+    \item \textbf{Model 8:} Redirecting adaptation to [query, value, intermediate.dense, classifier.dense, classifier.out\_proj] with increased capacity ($r=4$, $\alpha=24$) yielded 94.63\% validation accuracy with 934,676 parameters (0.75\%) but a further drop in Kaggle performance to 0.2110. This configuration notably removed adaptation from the key attention component while adding adaptation to classifier-specific layers. 
     
-    \begin{figure}[h]
-    \centering
-        \includegraphics[width=0.9\linewidth]{images/train_test_loss_95.31.png}
-    \caption{Train/test loss over 150 epochs (Model 10).}
-    \label{fig:training_performance}
-    \end{figure}
+    \item \textbf{Model 9:} Further concentrating adaptation on fewer modules [query, value, classifier.dense, classifier.out\_proj] with significantly higher capacity ($r=10$, $\alpha=32$) was tested to investigate the trade-off between module coverage and per-module adaptation depth but this produced worse validation accuracy (94.61\%) and was not submitted to Kaggle but the python notebook shows that this change deteriorated performance on the kaggle test set significantly.
 \end{enumerate}
 
-These changes increased the accuracy to 95.31\% and the Kaggle score to \textbf{0.85485}.
+Despite impressive validation metrics, Models 7 and 8 exhibited substantial degradation in Kaggle performance (0.2110--0.2670), revealing a critical disconnect between validation and generalization performance. This decline was particularly pronounced when adaptation was applied to classifier components, supporting the hypothesis that classifier-focused adaptation promotes overfitting by enhancing task-specific features rather than improving general-purpose representations \citep{hu2022lora}.
 
-This evolution demonstrates how systematic modifications to architecture, regularization, and training strategies collectively enhanced our model's performance and generalization on CIFAR-10. The iterative model accuracy improvements can be seen in \ref{fig:all_iterations}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.8\linewidth]{images/accuracy_charts.png}
-\caption{Training performance over successive model iterations showing progressive improvements in accuracy and kaggle score.}
-\label{fig:all_iterations}
-\end{figure}
-
-\section{Observations and Analysis}
-
-\subsection{Training Dynamics}
-Figure~\ref{fig:training_performance} shows the evolution of training and validation losses over 150 epochs. Early in training, aggressive data augmentation (RandAugment, ColorJitter, Random Erasing, MixUp, and CutMix) drives a rapid decrease in loss. In later epochs, a transition to a lighter augmentation scheme stabilizes the gradients and reduces noise, indicating effective fine-tuning and convergence.
-
-    \subsection{Ablation Studies}
-Our systematic ablation experiments reveal the impact of individual design choices:
-\begin{itemize}
-    \item \textbf{SWA and BatchNorm Freezing:} Activating Stochastic Weight Averaging (SWA) from 62.5\% of the training, together with freezing BatchNorm layers in the final 10\%, results in smoother loss curves and improved generalization. Omitting either technique increases variance and degrades performance.
-    \item \textbf{Regularization Techniques:} The combined use of dropout, stochastic depth, and label smoothing effectively minimizes overfitting. Removing any one of these methods causes a larger gap between training and validation losses.
-\end{itemize}
-
-These analyses confirm that each component—when applied individually or in combination—contributes significantly to robust convergence and improved generalization.
-
-
-
-\subsection{Confusion Matrix Analysis}
-To further assess class-level performance, we visualize the confusion matrix in Figure~\ref{fig:conf_matrix}. The strong diagonal dominance indicates the model accurately classifies most examples within each class. However, certain classes (e.g., \emph{cat} and \emph{dog}) exhibit minor confusion, reflecting their visual similarity at low resolution. Understanding these misclassifications can guide targeted augmentations or specialized fine-tuning strategies for even better results.
-\begin{figure}[ht]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/conf_matrix.png}
-    \caption{Confusion matrix for the final model on the CIFAR-10 test set. Diagonal dominance shows robust class performance, with minor off-diagonal entries indicating occasional misclassifications.}
-    \label{fig:conf_matrix}
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/model_4.png}
+        \caption{Model 7: Attention and FFN adaptation.}
+        \label{fig:model7}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/model_5.png}
+        \caption{Model 8: Attention, FFN, and Classifier adaptation.}
+        \label{fig:model8}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/model_6.png}
+        \caption{Model 9: Attention, and Classifier adaptation.}
+        \label{fig:model9}
+    \end{subfigure}
+    \caption{Comparison of learning curves for Models 7, 8, and 9. The performance drop in Kaggle scores highlights the risk of overfitting when adapting classifier components.}
+    \label{fig:module-adaptation}
 \end{figure}
 
-\subsection{Conclusion}
-We present a compact Residual Network that achieves state-of-the-art CIFAR‑10 performance with only 4.4 million parameters. Our final model reaches a Kaggle score of \textbf{0.85485} (95.31\% accuracy), proving that strategic architectural and training innovations can yield robust performance within a tight parameter budget. Key drivers include:
-\begin{itemize} 
-    \item \textbf{Modified Architecture:} A compact ResNet with Squeeze-and-Excitation blocks for dynamic channel recalibration.
-    \item \textbf{Advanced Regularization:} The combined use of FC dropout, stochastic depth, and label smoothing to mitigate overfitting.
-    \item \textbf{Dynamic Data Augmentation:} An aggressive early-stage augmentation strategy that transitions to a lighter scheme during fine-tuning.
-    \item \textbf{Optimized Training Strategy:} AdamW with a warmup phase, cosine annealing, and SWA to enhance convergence and stability.
-\end{itemize}
-\begin{table}[h]
-\centering
-\begin{tabular}{lccc}
-\hline
-\textbf{Variant} & \textbf{Accuracy (\%)} & \textbf{Kaggle Score} \\
-\hline
-Baseline  & 88.3 & 0.76536 \\
-+ Regularization &  89.8 & 0.78232 \\
-+ Data Augmentation  & 89.4 & 0.77075 \\
-+ AdamW + SWA  & 92.7 & 0.81584 \\
-+ Architecture Change & 94.06 & 0.8261\\
-+ SE Blocks &  94.6 & 0.84497 \\
-Final Model & \textbf{95.31} & \textbf{0.85485} \\
-\hline
-\end{tabular}
-\caption{Performance evolution across model iterations.}
-\label{tab:results_summary}
+\paragraph{Data Augmentation and Regularization (Models 10--11):} We investigated complementary approaches to reduce overfitting in order to be able to adapt the classifier without overfitting:
+\begin{enumerate}
+    \item \textbf{Model 10:} We employed comprehensive text augmentation (synonym replacement, random swapping, dropout noise, character-level perturbations) with conservative filtering ($\leq$ 100 words, $\leq$ 10\% non-alphabetic characters) while maintaining the architecture from Model 9 to isolate data augmentation effects. This configuration achieved 94.56\% validation accuracy with 985,000 parameters (0.79\%) but did not yield an improvement to the models classification performance on the Kaggle test set.
+    
+    \item \textbf{Model 11:} We explored a contrasting approach by removing all data constraints while enhancing model-level regularization (dropout 0.15, warmup ratio 0.15, label smoothing 0.1) to compare model-based versus data-based interventions however based on the previous regularization approach we did not expect this to yield significant improvements. This configuration produced a model with 985,000 parameters (0.79\%) which was not tested
+\end{enumerate}
+
+These experiments contrast two complementary approaches to improving generalization: curating cleaner training signals through explicit data preprocessing versus relying on model-level regularization to extract robust features from noisy data. These experiments aimed to mitigate overfitting in a higher capacity model with classifier adaptation but the results were not positive.
+
+\section{Discussion}
+Our systematic exploration of parameter-efficient fine-tuning for RoBERTa-base on AGNews reveals several important insights:
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{l|c|c|c|c}
+         \textbf{Config} & \textbf{Params} & \textbf{Val Acc.} & \textbf{Val Loss} & \textbf{Kaggle} \\
+         \hline
+         Baseline & 888k & 0.943421 & 0.172851 & 0.8418 \\
+         \hline
+         $r$=10, $\alpha$=16 & 962k & 0.943684 & 0.172327 & - \\
+         $r$=10, $\alpha$=32 & 962k & 0.946053 & 0.170443 & 0.8420 \\
+         \hline
+         attn+ffn& 925k & 0.948684 & 0.163645 & 0.2670 \\
+         attn+ffn+cls& 934k & 0.946316 & 0.169608 & 0.2110 \\
+         attn+cls& 985k & 0.946184 & 0.170281 & - \\
+         \hline
+         data aug+cls & 985k & 0.945658 & 0.169912 & - \\
+         reg+cls & 985k & - & - & - \\
+    \end{tabular}
+    \caption{Model configuration comparison showing parameter count, validation metrics, and Kaggle scores. The most significant performance drop occurred when adaptation focused on classifier components (Models 7-8), despite strong validation metrics.}
+    \label{tab:model_comparison}
 \end{table}
-Table~\ref{tab:results_summary} summarizes the performance evolution, highlighting the cumulative benefits of these design choices. Our results demonstrate that even under a 5M parameter constraint, systematic tuning and strategic model design can achieve competitive, real-world performance, setting a new benchmark for efficient deep learning on CIFAR‑10.
 
-\bibliographystyle{aaai}  % or your preferred bibliography style
+\textbf{Parameter Efficiency vs. Generalization}
+The most significant finding is the striking disparity between validation and test performance with certain adaptation strategies. While Models 7 and 8 achieved validation accuracy exceeding 94.8\%, their Kaggle performance deteriorated dramatically (0.2670 and 0.2110) compared to our baseline. This suggests validation metrics alone can be misleading indicators of generalization capability in parameter-constrained settings.
+
+This performance gap was most pronounced when adaptation targeted task-specific components like classifier layers. This aligns with \cite{hu2022lora}, that adapting classifier components might capture dataset-specific patterns rather than generalizable representations.
+
+\textbf{Strategic Module Selection}
+
+Our experiments demonstrate that which modules to adapt matters more than parameter count or adapter rank. Adapting attention components yielded robust generalization across datasets, while redirecting adaptation to classifier components deteriorated generalization despite strong validation metrics.
+
+The attention mechanism's ability to dynamically adjust context aggregation appears fundamental to robust adaptation, while task-specific layers seem more prone to dataset-specific overfitting.
+
+\section{Conclusion}
+
+This work investigated parameter-efficient fine-tuning of RoBERTa-base for AGNews classification using LoRA under a strict 1M parameter constraint. Our key conclusions:
+
+\begin{itemize}
+    \item Effective parameter-efficient adaptation depends more on strategic module selection than raw parameter count, with attention components proving consistently superior for generalization.
+    
+    \item A significant validation-generalization gap emerges with certain adaptation strategies, revealing limitations in standard evaluation practices.
+    
+    \item Parameter scaling alone yields diminishing returns beyond certain thresholds, which in our case was 10, suggesting fundamental limitations to capacity-focused approaches.
+\end{itemize}
+
+\textbf{Limitations and Future Work}
+
+This study was limited to a single dataset and model architecture. Future work should expand to diverse tasks and models, conduct controlled experiments with artificial distribution shifts to better isolate factors affecting generalization, explore more sophisticated augmentation and regularization strategies, and compare LoRA with alternative parameter-efficient methods.
+
+Despite these limitations, our work provides practical guidance for practitioners working with parameter-efficient fine-tuning methods under resource constraints. 
+
+Furthermore, due to limitations of compute not all experiments could be conducted multiple times to ensure accuracy and robustness of results. The results presented here are based on a single run of each configuration, and further validation is needed to confirm the findings.
+
 \bibliography{references}
-
+\bibliographystyle{abbrv}
 
 \end{document}

@@ -2,57 +2,75 @@
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\citation{he2015deep}
-\citation{hu2018squeeze}
+\citation{hu2022lora}
+\citation{hu2022lora}
+\citation{hu2022lora}
+\citation{li2023lora}
 \@writefile{toc}{\contentsline {section}{Introduction}{1}{section*.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Methodology}{1}{section*.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Architecture}{1}{section*.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Final Modified ResNet Architecture with SE Blocks: Feature extraction through successive convolutional and residual layers, followed by global pooling and a classification head.}}{1}{figure.1}\protected@file@percent }
-\newlabel{fig:resnet_architecture}{{1}{1}{Final Modified ResNet Architecture with SE Blocks: Feature extraction through successive convolutional and residual layers, followed by global pooling and a classification head}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{Training Methodology}{1}{section*.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Hyperparameter Tuning}{1}{section*.5}\protected@file@percent }
-\citation{loshchilov2019decoupled}
-\citation{loshchilov2016sgdr}
-\citation{izmailov2018averaging}
+\@writefile{toc}{\contentsline {subsection}{Architecture}{1}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{LoRA Parameterization:}{1}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Methodology}{1}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{LoRA Configuration}{1}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Rank ($r$) and Scaling ($\alpha $):}{1}{section*.6}\protected@file@percent }
+\citation{vaswani2017attention}
+\citation{liu2019roberta}
+\citation{kovaleva2019revealing}
+\citation{howard2018universal}
+\citation{loshchilov2017decoupled}
+\citation{liu2019roberta}
+\citation{srivastava2014dropout}
 \citation{szegedy2016rethinking}
-\citation{huang2016deep}
-\citation{cubuk2020randaugment}
-\citation{zhong2017random}
-\citation{zhang2018mixup}
-\citation{yun2019cutmix}
-\citation{he2015deep}
-\@writefile{toc}{\contentsline {subsection}{Optimization}{2}{section*.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Regularization and Loss Settings}{2}{section*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Data Augmentation and Fine-Tuning}{2}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Iterative Model Improvements}{2}{section*.9}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Train/test loss over 35 epochs (Model 1).}}{2}{figure.2}\protected@file@percent }
-\newlabel{fig:training_performance_8825}{{2}{2}{Train/test loss over 35 epochs (Model 1)}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Train/test loss over 80 epochs (Model 9).}}{3}{figure.3}\protected@file@percent }
-\newlabel{fig:training_performance_9462}{{3}{3}{Train/test loss over 80 epochs (Model 9)}{figure.3}{}}
-\@writefile{toc}{\contentsline {section}{Observations and Analysis}{3}{section*.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Training Dynamics}{3}{section*.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Train/test loss over 150 epochs (Model 10).}}{3}{figure.4}\protected@file@percent }
-\newlabel{fig:training_performance}{{4}{3}{Train/test loss over 150 epochs (Model 10)}{figure.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Training performance over successive model iterations showing progressive improvements in accuracy and kaggle score.}}{3}{figure.5}\protected@file@percent }
-\newlabel{fig:all_iterations}{{5}{3}{Training performance over successive model iterations showing progressive improvements in accuracy and kaggle score}{figure.5}{}}
-\@writefile{toc}{\contentsline {subsection}{Ablation Studies}{3}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{Confusion Matrix Analysis}{3}{section*.13}\protected@file@percent }
-\bibstyle{aaai}
+\citation{wei2019eda,cubuk2019autoaugment}
+\citation{zhang2015character}
+\citation{iyyer2015deep}
+\citation{wei2019eda}
+\citation{belinkov2018synthetic}
+\@writefile{toc}{\contentsline {paragraph}{Adapter Placement:}{2}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Optimizers and Learning Rate Scheduling}{2}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Regularization Techniques}{2}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Data Augmentation and Filtering}{2}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Iterative Model Improvements}{2}{section*.11}\protected@file@percent }
+\citation{hu2022lora}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:baseline}{{1a}{3}{Baseline}{figure.caption.12}{}}
+\newlabel{sub@fig:baseline}{{a}{3}{Baseline}{figure.caption.12}{}}
+\newlabel{fig:model2}{{1b}{3}{Model 2}{figure.caption.12}{}}
+\newlabel{sub@fig:model2}{{b}{3}{Model 2}{figure.caption.12}{}}
+\newlabel{fig:model3}{{1c}{3}{Model 3}{figure.caption.12}{}}
+\newlabel{sub@fig:model3}{{c}{3}{Model 3}{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Comparison of learning curves for Models 2 and 3}}{3}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:rank-exp}{{1}{3}{Comparison of learning curves for Models 2 and 3}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {paragraph}{Optimizer and Scheduler Variations (Models 4--6):}{3}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Module Expansion and Classifier Adaptation (Models 7--9):}{3}{section*.14}\protected@file@percent }
+\newlabel{fig:model7}{{2a}{3}{Model 7: Attention and FFN adaptation}{figure.caption.15}{}}
+\newlabel{sub@fig:model7}{{a}{3}{Model 7: Attention and FFN adaptation}{figure.caption.15}{}}
+\newlabel{fig:model8}{{2b}{3}{Model 8: Attention, FFN, and Classifier adaptation}{figure.caption.15}{}}
+\newlabel{sub@fig:model8}{{b}{3}{Model 8: Attention, FFN, and Classifier adaptation}{figure.caption.15}{}}
+\newlabel{fig:model9}{{2c}{3}{Model 9: Attention, and Classifier adaptation}{figure.caption.15}{}}
+\newlabel{sub@fig:model9}{{c}{3}{Model 9: Attention, and Classifier adaptation}{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Comparison of learning curves for Models 7, 8, and 9. The performance drop in Kaggle scores highlights the risk of overfitting when adapting classifier components.}}{3}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:module-adaptation}{{2}{3}{Comparison of learning curves for Models 7, 8, and 9. The performance drop in Kaggle scores highlights the risk of overfitting when adapting classifier components}{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {paragraph}{Data Augmentation and Regularization (Models 10--11):}{3}{section*.16}\protected@file@percent }
+\citation{hu2022lora}
 \bibdata{references}
-\bibcite{cubuk2020randaugment}{\citeauthoryear {Cubuk \bgroup et al\mbox  .\egroup }{2020}}
-\bibcite{he2015deep}{\citeauthoryear {He \bgroup et al\mbox  .\egroup }{2015}}
-\bibcite{hu2018squeeze}{\citeauthoryear {Hu, Shen, and Sun}{2018}}
-\bibcite{huang2016deep}{\citeauthoryear {Huang \bgroup et al\mbox  .\egroup }{2016}}
-\bibcite{izmailov2018averaging}{\citeauthoryear {Izmailov \bgroup et al\mbox  .\egroup }{2018}}
-\bibcite{loshchilov2016sgdr}{\citeauthoryear {Loshchilov and Hutter}{2017}}
-\bibcite{loshchilov2019decoupled}{\citeauthoryear {Loshchilov and Hutter}{2019}}
-\bibcite{szegedy2016rethinking}{\citeauthoryear {Szegedy \bgroup et al\mbox  .\egroup }{2016}}
-\bibcite{yun2019cutmix}{\citeauthoryear {Yun \bgroup et al\mbox  .\egroup }{2019}}
-\bibcite{zhang2018mixup}{\citeauthoryear {Zhang \bgroup et al\mbox  .\egroup }{2018}}
-\bibcite{zhong2017random}{\citeauthoryear {Zhong \bgroup et al\mbox  .\egroup }{2017}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Confusion matrix for the final model on the CIFAR-10 test set. Diagonal dominance shows robust class performance, with minor off-diagonal entries indicating occasional misclassifications.}}{4}{figure.6}\protected@file@percent }
-\newlabel{fig:conf_matrix}{{6}{4}{Confusion matrix for the final model on the CIFAR-10 test set. Diagonal dominance shows robust class performance, with minor off-diagonal entries indicating occasional misclassifications}{figure.6}{}}
-\@writefile{toc}{\contentsline {subsection}{Conclusion}{4}{section*.14}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Performance evolution across model iterations.}}{4}{table.1}\protected@file@percent }
-\newlabel{tab:results_summary}{{1}{4}{Performance evolution across model iterations}{table.1}{}}
+\bibcite{belinkov2018synthetic}{{1}{}{{}}{{}}}
+\bibcite{cubuk2019autoaugment}{{2}{}{{}}{{}}}
+\bibcite{howard2018universal}{{3}{}{{}}{{}}}
+\bibcite{hu2022lora}{{4}{}{{}}{{}}}
+\bibcite{iyyer2015deep}{{5}{}{{}}{{}}}
+\bibcite{kovaleva2019revealing}{{6}{}{{}}{{}}}
+\bibcite{li2023lora}{{7}{}{{}}{{}}}
+\bibcite{liu2019roberta}{{8}{}{{}}{{}}}
+\bibcite{loshchilov2017decoupled}{{9}{}{{}}{{}}}
+\bibcite{srivastava2014dropout}{{10}{}{{}}{{}}}
+\bibcite{szegedy2016rethinking}{{11}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {section}{Discussion}{4}{section*.17}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Model configuration comparison showing parameter count, validation metrics, and Kaggle scores. The most significant performance drop occurred when adaptation focused on classifier components (Models 7-8), despite strong validation metrics.}}{4}{table.caption.18}\protected@file@percent }
+\newlabel{tab:model_comparison}{{1}{4}{Model configuration comparison showing parameter count, validation metrics, and Kaggle scores. The most significant performance drop occurred when adaptation focused on classifier components (Models 7-8), despite strong validation metrics}{table.caption.18}{}}
+\@writefile{toc}{\contentsline {section}{Conclusion}{4}{section*.19}\protected@file@percent }
+\bibcite{vaswani2017attention}{{12}{}{{}}{{}}}
+\bibcite{wei2019eda}{{13}{}{{}}{{}}}
+\bibcite{zhang2015character}{{14}{}{{}}{{}}}
+\bibstyle{abbrv}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
 \gdef \@abspage@last{5}

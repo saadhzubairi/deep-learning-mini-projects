@@ -1,88 +1,75 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{10}
 
-\bibitem[\protect\citeauthoryear{Cubuk \bgroup et al\mbox.\egroup
-  }{2020}]{cubuk2020randaugment}
-Cubuk, E.~D.; Zoph, B.; Shlens, J.; and Le, Q.~V.
-\newblock 2020.
-\newblock Randaugment: Practical automated data augmentation with a reduced
-  search space.
-\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
-  Pattern Recognition Workshops},  702--703.
+\bibitem{belinkov2018synthetic}
+Y.~Belinkov and Y.~Bisk.
+\newblock Synthetic and natural noise both break neural machine translation.
+\newblock In {\em ICLR}, 2018.
 
-\bibitem[\protect\citeauthoryear{He \bgroup et al\mbox.\egroup
-  }{2015}]{he2015deep}
-He, K.; Zhang, X.; Ren, S.; and Sun, J.
-\newblock 2015.
-\newblock Deep residual learning for image recognition.
-\newblock {\em arXiv preprint arXiv:1512.03385}.
-\newblock Submitted on 10 Dec 2015.
+\bibitem{cubuk2019autoaugment}
+E.~D. Cubuk, B.~Zoph, D.~Mane, V.~Vasudevan, and Q.~V. Le.
+\newblock Autoaugment: Learning augmentation policies from data.
+\newblock In {\em CVPR}, pages 113--123, 2019.
 
-\bibitem[\protect\citeauthoryear{Hu, Shen, and Sun}{2018}]{hu2018squeeze}
-Hu, J.; Shen, L.; and Sun, G.
-\newblock 2018.
-\newblock Squeeze-and-excitation networks.
-\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
-  Pattern Recognition},  7132--7141.
+\bibitem{howard2018universal}
+J.~Howard and S.~Ruder.
+\newblock Universal language model fine-tuning for text classification.
+\newblock In {\em ACL}, pages 328--339, 2018.
 
-\bibitem[\protect\citeauthoryear{Huang \bgroup et al\mbox.\egroup
-  }{2016}]{huang2016deep}
-Huang, G.; Sun, Y.; Liu, Z.; Sedra, D.; and Weinberger, K.~Q.
-\newblock 2016.
-\newblock Deep networks with stochastic depth.
-\newblock In {\em European Conference on Computer Vision},  646--661.
+\bibitem{hu2022lora}
+E.~J. Hu, Y.~Shen, P.~Wallis, Z.~Allen-Zhu, Y.~Li, S.~Wang, L.~Wang, and
+  W.~Chen.
+\newblock Lora: Low-rank adaptation of large language models, 2021.
 
-\bibitem[\protect\citeauthoryear{Izmailov \bgroup et al\mbox.\egroup
-  }{2018}]{izmailov2018averaging}
-Izmailov, P.; Podoprikhin, D.; Garipov, T.; Vetrov, D.; and Wilson, A.~G.
-\newblock 2018.
-\newblock Averaging weights leads to wider optima and better generalization.
-\newblock In {\em Proceedings of the International Conference on Machine
-  Learning}.
+\bibitem{iyyer2015deep}
+M.~Iyyer, A.~Manjunatha, J.~Boyd-Graber, and H.~D. III.
+\newblock Deep unordered composition rivals syntactic methods for text
+  classification.
+\newblock In {\em ACL}, pages 1681--1691, 2015.
 
-\bibitem[\protect\citeauthoryear{Loshchilov and
-  Hutter}{2017}]{loshchilov2016sgdr}
-Loshchilov, I., and Hutter, F.
-\newblock 2017.
-\newblock Sgdr: Stochastic gradient descent with warm restarts.
-\newblock In {\em International Conference on Learning Representations}.
+\bibitem{kovaleva2019revealing}
+O.~Kovaleva, A.~Romanov, A.~Rogers, and A.~Rumshisky.
+\newblock Revealing the dark secrets of bert.
+\newblock In {\em EMNLP-IJCNLP}, pages 4365--4374, 2019.
 
-\bibitem[\protect\citeauthoryear{Loshchilov and
-  Hutter}{2019}]{loshchilov2019decoupled}
-Loshchilov, I., and Hutter, F.
-\newblock 2019.
+\bibitem{li2023lora}
+S.~Li, Y.~Yang, Y.~Shen, F.~Wei, Z.~Lu, L.~Qiu, and Y.~Yang.
+\newblock Expressive and generalizable low-rank adaptation for large models via
+  slow cascaded learning, 2024.
+
+\bibitem{liu2019roberta}
+Y.~Liu, M.~Ott, N.~Goyal, J.~Du, M.~Joshi, D.~Chen, O.~Levy, M.~Lewis,
+  L.~Zettlemoyer, and V.~Stoyanov.
+\newblock Roberta: A robustly optimized bert pretraining approach, 2019.
+
+\bibitem{loshchilov2017decoupled}
+I.~Loshchilov and F.~Hutter.
 \newblock Decoupled weight decay regularization.
-\newblock {\em arXiv preprint arXiv:1711.05101}.
+\newblock In {\em ICLR}, 2019.
 
-\bibitem[\protect\citeauthoryear{Szegedy \bgroup et al\mbox.\egroup
-  }{2016}]{szegedy2016rethinking}
-Szegedy, C.; Vanhoucke, V.; Ioffe, S.; Shlens, J.; and Wojna, Z.
-\newblock 2016.
-\newblock Rethinking the inception architecture for computer vision.
-\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
-  Pattern Recognition},  2818--2826.
+\bibitem{srivastava2014dropout}
+N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov.
+\newblock Dropout: A simple way to prevent neural networks from overfitting.
+\newblock {\em JMLR}, 15(56):1929--1958, 2014.
 
-\bibitem[\protect\citeauthoryear{Yun \bgroup et al\mbox.\egroup
-  }{2019}]{yun2019cutmix}
-Yun, S.; Han, D.; Oh, S.~J.; Chun, S.; Choe, J.; and Yoo, Y.
-\newblock 2019.
-\newblock Cutmix: Regularization strategy to train strong classifiers with
-  localizable features.
-\newblock In {\em Proceedings of the IEEE International Conference on Computer
-  Vision},  6023--6032.
+\bibitem{szegedy2016rethinking}
+C.~Szegedy, V.~Vanhoucke, S.~Ioffe, J.~Shlens, and Z.~Wojna.
+\newblock Rethinking the inception architecture for computer vision, 2015.
 
-\bibitem[\protect\citeauthoryear{Zhang \bgroup et al\mbox.\egroup
-  }{2018}]{zhang2018mixup}
-Zhang, H.; Cisse, M.; Dauphin, Y.~N.; and Lopez-Paz, D.
-\newblock 2018.
-\newblock mixup: Beyond empirical risk minimization.
-\newblock In {\em International Conference on Learning Representations}.
+\bibitem{vaswani2017attention}
+A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit, L.~Jones, A.~N. Gomez,
+  L.~Kaiser, and I.~Polosukhin.
+\newblock Attention is all you need.
+\newblock {\em NeurIPS}, 30, 2017.
 
-\bibitem[\protect\citeauthoryear{Zhong \bgroup et al\mbox.\egroup
-  }{2017}]{zhong2017random}
-Zhong, Z.; Zheng, L.; Li, G.; Zhou, S.; Li, S.; and Yang, Y.
-\newblock 2017.
-\newblock Random erasing data augmentation.
-\newblock In {\em Proceedings of the AAAI Conference on Artificial
-  Intelligence}, volume~31,  13001--13008.
+\bibitem{wei2019eda}
+J.~Wei and K.~Zou.
+\newblock Eda: Easy data augmentation techniques for boosting performance on
+  text classification tasks.
+\newblock In {\em EMNLP-IJCNLP}, 2019.
+
+\bibitem{zhang2015character}
+X.~Zhang, J.~Zhao, and Y.~LeCun.
+\newblock Character-level convolutional networks for text classification.
+\newblock In {\em NeurIPS}, volume~28, 2015.
 
 \end{thebibliography}
