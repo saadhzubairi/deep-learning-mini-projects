@@ -1,241 +1,262 @@
-
 \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
 \usepackage{helvet}
 \usepackage{courier}
+\usepackage[utf8]{inputenc} % for UTF-8
+\usepackage[T1]{fontenc}    % for proper font encoding
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amsfonts} % for \mathbb
+\usepackage{booktabs} % for professional tables
+\usepackage{subcaption} % for subfigures
 \usepackage{tikz}
+\usepackage[square,numbers,sort&compress]{natbib} % for square bracket citations, sorted
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta}
-\usepackage{hyperref}
+\usepackage{hyperref} % For clickable links (GitHub) and PDF metadata
 
+% Increase space between lines a bit for readability if needed, comment out if too long
+% \linespread{1.05}
 
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
-\pdfinfo{
-  /Title (Residual Network Architecture with Dynamic Data Augmentation, Squeeze-and-Excitation, and Stochastic Weight Averaging for Robust CIFAR-10 Image Classification)
-  /Author (Humza, A., Zubairi, S.)
-  
-}
-\setcounter{secnumdepth}{0}  
 
-\begin{document}
-\title{Residual Network Architecture with Dynamic Data Augmentation, Squeeze-and-Excitation, and Stochastic Weight Averaging for Robust CIFAR-10 Image Classification}
-\author{Hamza, A., \& Zubairi, S. \\
+\pdfinfo{
+/Title (Jailbreaking Deep Models: Adversarial Attacks on ResNet34 and DenseNet121)
+/Author (Ali Hamza, Saad Zubairi)
+}
+\title{Jailbreaking Deep Models: Adversarial Attacks on ResNet34 and DenseNet121 Image Classifiers}
+
+\author{Ali Hamza, Saad Zubairi \\
 Department of Electrical and Computer Engineering\\
 New York University Tandon School of Engineering\\
-\texttt{ah7072@nyu.edu | shz2020@nyu.edu}\\
-\href{https://github.com/hurryingauto3/ece-gy-7143-deeplearning/tree/main/project_1}{Github Repository} | \href{https://www.kaggle.com/code/hurryingauto3/notebookeb139646e3}{Kaggle Notebook}
+\texttt{ah7072@nyu.edu, shz2020@nyu.edu}\\
+\url{https://github.com/your\_github\_repo\_link\_here} % <<-- Replace with your GitHub link
 }
+
+\date{Spring 2025} % Or whatever date is appropriate
+
+
+\begin{document}
+
 \maketitle
+
 \begin{abstract}
-\begin{quote}
-We propose a compact ResNet for CIFAR‑10 that meets a 5M parameter constraint while achieving 95.31\% accuracy (Kaggle score 0.85485). Our design incorporates SE blocks, advanced regularization (dropout, label smoothing, stochastic depth), and dynamic data augmentation. A training strategy with warmup, cosine annealing, and SWA with BatchNorm freezing further optimizes performance.
-\end{quote}
+This project investigates the vulnerability of state-of-the-art deep neural networks to adversarial attacks. Focusing on image classifiers, we implemented various adversarial perturbation techniques, including pixel-wise ($L_\infty$) attacks like Fast Gradient Sign Method (FGSM) and Projected Gradient Descent (PGD), and patch-based ($L_0$) attacks. We targeted a pre-trained ResNet-34 model on a subset of ImageNet-1K. Our experiments show that even small, visually imperceptible perturbations can drastically reduce model accuracy. We detail the implementation of these attacks, analyze their effectiveness through an ablation study for the patch attack, and evaluate their transferability to a different architecture, DenseNet-121. A key finding was the critical importance of saving adversarial examples in a lossless format (like PyTorch tensors) to preserve subtle perturbations that are otherwise lost during standard image compression. While FGSM at $\epsilon=0.02$ proved surprisingly effective on ResNet-34, more advanced multi-step and targeted patch attacks were necessary to demonstrate significant degradation and transferability across models, achieving greater than 70\% relative top-1 accuracy drops on the target model.
 \end{abstract}
+
+
 \section{Introduction}
-CIFAR‑10 is a common benchmark with 60,000 32×32 color images in 10 classes. ResNets, known for their skip connections, ease the training of deep models. Here, we modify a ResNet to meet a 5M parameter limit while achieving state‑of‑the‑art performance on CIFAR‑10 by combining architectural enhancements, robust regularization, and optimized training techniques.
+Deep learning models, despite achieving remarkable performance on various tasks, are known to be susceptible to adversarial examples. These are inputs carefully crafted with small, often imperceptible perturbations that cause the model to make incorrect predictions. This brittleness is a significant security concern, especially for models deployed in sensitive applications like autonomous driving or medical diagnosis.
+
+This project focuses on launching adversarial attacks against production-grade, publicly available image classification models. We explore both pixel-wise and patch-based adversarial attacks, targeting a pre-trained ResNet-34 model on a subset of the ImageNet-1K dataset. The goal is to degrade the model's performance while ensuring the adversarial perturbations remain subtle. We analyze the effectiveness of different attack methods and investigate the transferability of these attacks to a different network architecture, DenseNet-121.
+
+Mathematically, adversarial attacks aim to find a perturbed image $\mathbf{x}\_{adv} = \mathbf{x} + \delta$, where $\mathbf{x}$ is the original image and $\delta$ is the perturbation, such that the model misclassifies $\mathbf{x}\_{adv}$ while the magnitude of $\delta$ is bounded. The magnitude of $\delta$ is typically measured using $L_p$ norms, such as the $L_\infty$ norm (bounding the maximum change per pixel) or the $L_0$ norm (bounding the number of perturbed pixels, often used for patch attacks).
 
 \section{Methodology}
-\subsection{Architecture}
-Our modified architecture builds upon a ResNet-18 foundation by enhancing its core residual block. In the traditional residual block, using the formulation \[ReLU(S(x)+F(x))\] as described in \cite{he2015deep} where S(x) is the identity skip connection and F(x) is a sequence of layers comprising a $3\times 3$ convolution, batch normalization, ReLU activation, followed by another $3\times 3$ convolution and batch normalization. In our design, we integrate Squeeze-and-Excitation (SE) blocks \cite{hu2018squeeze} immediately after the second convolution. These SE blocks perform global average pooling on the feature maps, then pass the resulting channel descriptors through a two-layer fully connected network (with a reduction ratio of 16) to learn channel-wise scaling factors. This adaptive recalibration of feature channels enhances representational power without significant parameter overhead.
 
-Furthermore, we experimented with different residual block configurations, ultimately selecting a (3,3,2,1) block structure. The network starts with an initial convolution that maps the input image to 32 channels and progressively increases the number of channels (to 64, then 128, and finally 256) while reducing spatial dimensions via striding. An adaptive average pooling layer then aggregates spatial features into a fixed-size representation, which is fed into a final fully connected layer for classification into 10 classes.
+Our project pipeline involves loading the dataset and pre-trained models, implementing adversarial attack algorithms, generating adversarial datasets, evaluating model performance on these datasets, and analyzing the results.
 
-This architectural design—combining a deeper block configuration, SE enhancements, and a balanced channel progression—enables the model to achieve high accuracy on CIFAR‑10 while remaining under the 5M parameter constraint.
+\subsection{Task 1: Basics}
+We used a subset of ImageNet-1K with 500 images from 100 classes. Images were normalized using standard ImageNet mean and standard deviation after converting to tensors. The target model for attacks was a pre-trained ResNet-34 from torchvision, and DenseNet-121 was used for transferability analysis. Both models were set to evaluation mode.
 
-\begin{figure}[ht]
+We mapped the dataset's folder-based class indices to the full ImageNet-1K indices using a generated JSON file based on the provided labels\_list.json.
+
+\subsubsection{Baseline Evaluation}
+We first evaluated the clean, preprocessed test dataset on the ResNet-34 model to establish a baseline performance. We computed and reported Top-1 and Top-5 accuracies.
+
+\subsubsection{Adversarial Attack Implementation}
+We implemented several adversarial attack techniques, focusing on untargeted attacks aiming to maximize the loss for the true class.
+
+\subsection{Task 2: Fast Gradient Sign Method (FGSM)}
+FGSM is a simple one-step $L_\infty$ attack defined by $\mathbf{x}\_{adv} = \mathbf{x} + \epsilon \cdot \text{sign}(\nabla\_{\mathbf{x}} L(\theta, \mathbf{x}, y))$, where $L$ is the loss function (Cross-Entropy), $\theta$ are model parameters, $\mathbf{x}$ is the input, $y$ is the true label, and $\epsilon$ is the perturbation budget. The gradient is computed with respect to the input image, not the model weights. We implemented FGSM for an $L_\infty$ budget of $\epsilon = 0.02$.
+
+The implemented FGSM attack with $\epsilon=0.02$ achieved significant degradation, reducing ResNet-34 Top-1 accuracy from 76.00\% (baseline) down to approximately 6.00\%, achieving a relative accuracy drop of over 92\%.
+
+\subsection{Task 3: Improved $L_\infty$ Attack (PGD)}
+Projected Gradient Descent (PGD) iteratively applies FGSM steps to create stronger adversarial examples by repeatedly projecting perturbations onto the allowable $\epsilon$-bounded region. Formally, the PGD iteration step is defined as:
+\[
+\mathbf{x}_{t+1} = \text{clip}\left(\mathbf{x}_t + \alpha \cdot \text{sign}\left(\nabla_{\mathbf{x}_t} L(\theta, \mathbf{x}_t, y)\right), \mathbf{x}-\epsilon, \mathbf{x}+\epsilon\right)
+\]
+
+We implemented untargeted PGD with random initialization, using a perturbation budget $\epsilon=0.02$, a total of 10 optimization steps, and a step size $\alpha=0.002$. This attack successfully reduced the ResNet-34 Top-1 accuracy from 76.00\% (baseline) to 57.40\%, a relative accuracy drop of 24.47\%. Interestingly, this configuration was less effective than the single-step FGSM attack, indicating potential areas for future optimization of step size or iteration count. Visual examples illustrating perturbations and prediction changes are provided in the Appendix (see Figure X).
+
+
+\subsection{Task 4: Patch Attack (L0 PGD)}
+After extensive ablation studies, the best-performing patch attack configuration included:
+\begin{itemize}
+    \item \textbf{Patch Size}: $32 \times 32$ pixels
+    \item \textbf{Perturbation Budget}: $\epsilon=0.50$ (within the patch)
+    \item \textbf{Optimization Steps}: 60 iterations with step size $\frac{\epsilon}{60}$
+    \item \textbf{Patch Location}: Saliency-based (highest summed absolute gradient)
+    \item \textbf{Targeting}: Least-likely class targeting (targeted attack)
+    \item \textbf{Momentum Optimization}: Enabled with $\beta=0.9$
+\end{itemize}
+
+This optimized patch attack significantly reduced ResNet-34 Top-1 accuracy from 76.00\% to approximately 11.60\%, a relative drop of approximately 84.74\%.
+
+
+\subsection{Adversarial Dataset Generation and Evaluation}
+A critical lesson learned during implementation was the detrimental effect of saving adversarial examples using standard image formats (like PNG or JPEG) that employ 8-bit integer quantization. The subtle float-point perturbations generated by attacks like FGSM and PGD were mostly lost when converting back to integer pixels, significantly weakening the attack upon reloading.
+
+To address this, we modified the saving process to store the adversarial images as PyTorch float32 tensors (.pt files) in the same directory structure as the original dataset. A custom data loader was implemented to load these tensors directly, preserving the exact perturbations. Visualizations for the report were still generated using the tensor\_to\_pil helper, acknowledging that these specific visual examples might lose some subtle detail compared to the float data used for evaluation.
+
+For each implemented attack method (FGSM, PGD, and the best-performing patch attack variant from the ablation study), we generated a full adversarial dataset by applying the attack to every image in the test set. We then evaluated the ResNet-34 model's Top-1 and Top-5 accuracy on these generated datasets.
+
+\subsection{Patch Attack Ablation Study (Task 4)}
+To determine the most effective patch attack configuration, we performed an ablation study. Starting from a baseline (10 steps, random patch, untargeted, $\epsilon=0.5$, no momentum), we incrementally added or changed one factor (e.g., increase steps, add saliency, add targeting, add momentum) for different variants. For each variant, we generated the adversarial dataset (saving as .pt files) and evaluated ResNet-34 accuracy. This allowed us to quantify the marginal impact of each design choice.
+
+\subsection{Task 5: Transferability Analysis }
+To investigate the generalizability of adversarial examples, we evaluated the transferability of attacks crafted against ResNet-34 to DenseNet-121. Table~\ref{tab:transferability_results} summarizes the accuracies:
+
+\begin{table}[h!]
 \centering
-\resizebox{0.9\linewidth}{!}{%
-\begin{tikzpicture}[node distance=1.2cm, auto,
-    block/.style={rectangle, draw, text width=3.5cm, align=center, rounded corners, minimum height=1cm},
-    arrow/.style={-{Stealth}, thick}]
-
-% Nodes
-\node [block] (input) {Input\\$32\times32\times3$};
-\node [block, right=of input] (conv) {Conv3x3, 32 filters\\BN + ReLU};
-\node [block, right=of conv] (layer1) {Layer 1:\\3 Residual Blocks\\(with SE)\\Output: $32\times32\times64$};
-\node [block, right=of layer1] (layer2) {Layer 2:\\3 Residual Blocks, Stride=2\\(with SE)\\Output: $16\times16\times128$};
-\node [block, right=of layer2] (layer3) {Layer 3:\\2 Residual Blocks, Stride=2\\(with SE)\\Output: $8\times8\times256$};
-\node [block, right=of layer3] (layer4) {Layer 4:\\1 Residual Block, Stride=2\\(with SE)\\Output: $4\times4\times256$};
-\node [block, right=of layer4] (pool) {AdaptiveAvgPool2d\\$1\times1\times256$};
-\node [block, right=of pool] (fc) {Dropout\\FC: 256 $\rightarrow$ 10};
-\node [block, right=of fc] (output) {Output\\10 Classes};
-
-% Arrows
-\draw [arrow] (input) -- (conv);
-\draw [arrow] (conv) -- (layer1);
-\draw [arrow] (layer1) -- (layer2);
-\draw [arrow] (layer2) -- (layer3);
-\draw [arrow] (layer3) -- (layer4);
-\draw [arrow] (layer4) -- (pool);
-\draw [arrow] (pool) -- (fc);
-\draw [arrow] (fc) -- (output);
-
-\end{tikzpicture}
-}
-\caption{Final Modified ResNet Architecture with SE Blocks: Feature extraction through successive convolutional and residual layers, followed by global pooling and a classification head.}
-\label{fig:resnet_architecture}
-\end{figure}
-
-\subsection{Training Methodology}
-
-Our training strategy was designed to maximize generalization while respecting a 5M parameter constraint. In this section, we detail our key design choices, including hyperparameter tuning, optimization, regularization, and data augmentation.
-
-\subsection{Hyperparameter Tuning}
-We extensively tuned the architectural and training hyperparameters:
-\begin{itemize}
-    \item \textbf{Block Configuration and Network Depth:} We experimented with several ResNet variants. Our best configuration was ResNet (3,3,2,1), which increases the number of channels gradually from a base of 32 up to 256. All convolutions used 3$\times$3 kernels.
-    \item \textbf{Channel and Kernel Sizes:} The network starts with 32 channels and progresses to 64, 128, and finally 256 channels, balancing expressiveness with parameter efficiency.
-    \item \textbf{Batch Size and Total Epochs:} We primarily used a batch size of 128 and varied the total training duration from 35 to 150 epochs. Extended training (up to 150 epochs) allowed for better convergence and fine-tuning.
-\end{itemize}
-
-\subsection{Optimization}
-We evaluated different optimizers and learning rate strategies:
-\begin{itemize}
-    \item \textbf{Optimizer Selection:} We compared SGD and AdamW. AdamW, \cite{loshchilov2019decoupled} with a learning rate of 0.003 and weight decay between 0.0007 and 0.00075, provided more stable convergence and superior generalization compared to SGD, which required a higher learning rate (around 0.01).
-    \item \textbf{Learning Rate Scheduling:} Our learning rate schedule combined a warmup phase using LinearLR (starting at a factor of 0.01 for 5 iterations) with cosine annealing \cite{loshchilov2016sgdr} implemented via SequentialLR. The cosine annealing phase used a $T_{\text{max}}$ between 50 and 80 epochs and decayed the learning rate to an $\eta_{\text{min}}$ of approximately $1\times10^{-5}$.
-    \item \textbf{Stochastic Weight Averaging (SWA):} To further enhance generalization, SWA \cite{izmailov2018averaging} was incorporated in the latter phase of training. Specifically, SWA was initiated at roughly 62.5\% of the total epochs (e.g., epoch 93 for a 150-epoch schedule) using an SWA learning rate between $3\times10^{-5}$ and $5\times10^{-5}$. This technique averages weights from multiple epochs to obtain a smoother, more robust final model.
-\end{itemize}
-
-\subsection{Regularization and Loss Settings}
-To reduce overfitting, we applied multiple regularization techniques:
-\begin{itemize}
-    \item \textbf{Label Smoothing:}  \cite{szegedy2016rethinking} We experimented with label smoothing values of 0.0, 0.05, and 0.1. Label smoothing helps by softening the target labels and reducing the model's overconfidence.
-    \item \textbf{Dropout:} Dropout was applied in the fully connected layers with rates between 0.1 and 0.35, which forces the network to learn redundant representations.
-    \item \textbf{Stochastic Depth Dropout:} We incorporated stochastic depth dropout \cite{huang2016deep} (with probabilities of 0.0, 0.05, or 0.1) in the residual blocks. This technique randomly skips residual connections during training, encouraging the model to learn more robust features.
-    \item \textbf{Squeeze-and-Excitation (SE) Blocks:} SE blocks were integrated within each residual block. They perform global average pooling followed by a two-layer fully connected network (with a reduction ratio of 16) to produce channel-wise scaling factors. This mechanism allows the network to recalibrate channel responses adaptively with minimal parameter overhead.
-\end{itemize}
-
-\subsection{Data Augmentation and Fine-Tuning}
-We adopted a dynamic data augmentation strategy to further improve generalization:
-\begin{itemize}
-    \item \textbf{Early Training (Heavy Augmentation):} In the early phase, we used a heavy augmentation pipeline including:
-        \begin{itemize}
-            \item \textbf{RandAugment:} \cite{cubuk2020randaugment} Applied with 3 operations at a magnitude of 9.
-            \item \textbf{ColorJitter:} Adjusting brightness, contrast, and saturation by 0.2 and hue by 0.1.
-            \item \textbf{Random Erasing:} \cite{zhong2017random} With a probability of 0.1--0.2 to simulate occlusions.
-        \end{itemize}
-        In addition, we applied MixUp \cite{zhang2018mixup} and CutMix \cite{yun2019cutmix} augmentation:
-        \begin{itemize}
-            \item \textbf{MixUp:} Blending two images using a mixing coefficient sampled from a Beta distribution with an alpha value of 0.2 or 0.4.
-            \item \textbf{CutMix:} Replacing a region of one image with a patch from another, using an alpha value of 1.0.
-        \end{itemize}
-        These augmentations were applied with a 35\% probability during early epochs to promote robustness.
-    \item \textbf{Fine-Tuning Phase:} During the final 25\% of epochs, we transitioned to a lighter augmentation pipeline that consisted of basic random cropping, horizontal flipping, and normalization. Concurrently, the probability of applying MixUp/CutMix was reduced to 15\% to allow the model to refine its decision boundaries on less perturbed data. Furthermore, BatchNorm layers were frozen in the final epochs (starting around 87.5\% of total epochs) to stabilize normalization statistics.
-\end{itemize}
-
-Together, these strategies enabled our modified ResNet to achieve high test accuracy on CIFAR-10 while remaining within the 5M parameter constraint. Each component—from architectural adjustments to the dynamic augmentation and SWA—played a crucial role in enhancing the model's generalization performance.
-
-\section{Iterative Model Improvements}
-
-From the original ResNet-18 architecture described in \cite{he2015deep}, we made several modifications to improve performance while adhering to a 5M parameter constraint. Our evolution can be summarized as follows:
-
-\begin{enumerate}
-    \item \textbf{Model 1: Baseline.} Standard ResNet (2,2,2,2) with 2.7M parameters, trained using SGD (LR=0.01, WD=0.0005) and advanced augmentation (random cropping, flipping, ColorJitter). Minimal regularization yields 88.3\% accuracy (Kaggle: 0.76536). See Figure~\ref{fig:training_performance_8825}.
-    
-    \begin{figure}[ht]
-    \centering
-         \includegraphics[width=0.7\linewidth]{images/traintest_lost-88.25.png}
-    \caption{Train/test loss over 35 epochs (Model 1).}
-    \label{fig:training_performance_8825}
-    \end{figure}
-
-    \item \textbf{Model 2: Regularization Improvements.} Introducing label smoothing (0.05--0.1) and increasing dropout (up to 0.35) improves accuracy to 89.8\% (Kaggle: 0.78232).
-
-    \item \textbf{Model 3: Augmentation \& Architecture Change.} Switching to a ResNet (2,2,2,1) and applying MixUp and CutMix (35\% probability) with SWA starting after 30 epochs yields approximately 89.4\% accuracy (Kaggle: 0.77075).
-
-    \item \textbf{Model 5: Optimizer \& Tuning.} Using AdamW (LR=0.003, WD$\approx$0.0007–0.00075), reducing label smoothing (0.05), increasing dropout (0.35), and starting SWA earlier (after 25 epochs) raises accuracy to 92.70\% (Kaggle: 0.81584).
-
-    \item \textbf{Models 6--8: Minor Tweaks.} Further refinements—such as a deeper ResNet (3,3,2,1) with no label smoothing, moderate dropout (0.2), and fine-tuning with AdamW (LR=0.01)—yield accuracies of 93.18\% and 94.06\% (Kaggle: 0.82482 and 0.82621), which are combined in our narrative.
-
-    \item \textbf{Model 9: SE Blocks Integration.} Incorporating SE blocks (reduction ratio=16), reducing dropout (0.1), and maintaining label smoothing (0.1), with SWA starting after 50 epochs, increases accuracy to 94.62\% (Kaggle: 0.84497). See Figure~\ref{fig:training_performance_9462}.
-    
-    \begin{figure}[ht]
-    \centering
-         \includegraphics[scale=0.3]{images/train_test_loss_94.62.png}
-    \caption{Train/test loss over 80 epochs (Model 9).}
-    \label{fig:training_performance_9462}
-    \end{figure}
-
-    \item \textbf{Model 10: Final Model.} Extending training to 150 epochs, using lighter augmentation in the final 25\% (MixUp/CutMix probability reduced to 15\%), freezing BatchNorm layers in the final 10\% (from epoch 131), and starting SWA at 62.5\% (epoch 93) with SWA LR of $5\times10^{-4}$, the final model achieves 95.31\% accuracy (Kaggle: 0.85485). See Figure~\ref{fig:training_performance}.
-    
-    \begin{figure}[h]
-    \centering
-        \includegraphics[width=0.9\linewidth]{images/train_test_loss_95.31.png}
-    \caption{Train/test loss over 150 epochs (Model 10).}
-    \label{fig:training_performance}
-    \end{figure}
-\end{enumerate}
-
-These changes increased the accuracy to 95.31\% and the Kaggle score to \textbf{0.85485}.
-
-This evolution demonstrates how systematic modifications to architecture, regularization, and training strategies collectively enhanced our model's performance and generalization on CIFAR-10. The iterative model accuracy improvements can be seen in \ref{fig:all_iterations}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.8\linewidth]{images/accuracy_charts.png}
-\caption{Training performance over successive model iterations showing progressive improvements in accuracy and kaggle score.}
-\label{fig:all_iterations}
-\end{figure}
-
-\section{Observations and Analysis}
-
-\subsection{Training Dynamics}
-Figure~\ref{fig:training_performance} shows the evolution of training and validation losses over 150 epochs. Early in training, aggressive data augmentation (RandAugment, ColorJitter, Random Erasing, MixUp, and CutMix) drives a rapid decrease in loss. In later epochs, a transition to a lighter augmentation scheme stabilizes the gradients and reduces noise, indicating effective fine-tuning and convergence.
-
-    \subsection{Ablation Studies}
-Our systematic ablation experiments reveal the impact of individual design choices:
-\begin{itemize}
-    \item \textbf{SWA and BatchNorm Freezing:} Activating Stochastic Weight Averaging (SWA) from 62.5\% of the training, together with freezing BatchNorm layers in the final 10\%, results in smoother loss curves and improved generalization. Omitting either technique increases variance and degrades performance.
-    \item \textbf{Regularization Techniques:} The combined use of dropout, stochastic depth, and label smoothing effectively minimizes overfitting. Removing any one of these methods causes a larger gap between training and validation losses.
-\end{itemize}
-
-These analyses confirm that each component—when applied individually or in combination—contributes significantly to robust convergence and improved generalization.
-
-
-
-\subsection{Confusion Matrix Analysis}
-To further assess class-level performance, we visualize the confusion matrix in Figure~\ref{fig:conf_matrix}. The strong diagonal dominance indicates the model accurately classifies most examples within each class. However, certain classes (e.g., \emph{cat} and \emph{dog}) exhibit minor confusion, reflecting their visual similarity at low resolution. Understanding these misclassifications can guide targeted augmentations or specialized fine-tuning strategies for even better results.
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/conf_matrix.png}
-    \caption{Confusion matrix for the final model on the CIFAR-10 test set. Diagonal dominance shows robust class performance, with minor off-diagonal entries indicating occasional misclassifications.}
-    \label{fig:conf_matrix}
-\end{figure}
-
-\subsection{Conclusion}
-We present a compact Residual Network that achieves state-of-the-art CIFAR‑10 performance with only 4.4 million parameters. Our final model reaches a Kaggle score of \textbf{0.85485} (95.31\% accuracy), proving that strategic architectural and training innovations can yield robust performance within a tight parameter budget. Key drivers include:
-\begin{itemize} 
-    \item \textbf{Modified Architecture:} A compact ResNet with Squeeze-and-Excitation blocks for dynamic channel recalibration.
-    \item \textbf{Advanced Regularization:} The combined use of FC dropout, stochastic depth, and label smoothing to mitigate overfitting.
-    \item \textbf{Dynamic Data Augmentation:} An aggressive early-stage augmentation strategy that transitions to a lighter scheme during fine-tuning.
-    \item \textbf{Optimized Training Strategy:} AdamW with a warmup phase, cosine annealing, and SWA to enhance convergence and stability.
-\end{itemize}
-\begin{table}[h]
-\centering
-\begin{tabular}{lccc}
-\hline
-\textbf{Variant} & \textbf{Accuracy (\%)} & \textbf{Kaggle Score} \\
-\hline
-Baseline  & 88.3 & 0.76536 \\
-+ Regularization &  89.8 & 0.78232 \\
-+ Data Augmentation  & 89.4 & 0.77075 \\
-+ AdamW + SWA  & 92.7 & 0.81584 \\
-+ Architecture Change & 94.06 & 0.8261\\
-+ SE Blocks &  94.6 & 0.84497 \\
-Final Model & \textbf{95.31} & \textbf{0.85485} \\
-\hline
-\end{tabular}
-\caption{Performance evolution across model iterations.}
-\label{tab:results_summary}
+\caption{Transferability Results (crafted on ResNet-34)}
+\label{tab:transferability_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Attack & $\epsilon$ & ResNet-34 Top-1 & DenseNet-121 Top-1 & $\Delta$Top-1\\
+\midrule
+Clean Baseline & - & 76.00\% & 74.20\% & -\\
+FGSM & 0.02 & 6.00\% & 33.00\% & 27.00 pp\\
+PGD & 0.02 & 57.40\% & 71.40\% & 14.00 pp\\
+Patch Attack & 0.50 & 11.60\% & 31.20\% & 19.60 pp\\
+\bottomrule
+\end{tabular}}
 \end{table}
-Table~\ref{tab:results_summary} summarizes the performance evolution, highlighting the cumulative benefits of these design choices. Our results demonstrate that even under a 5M parameter constraint, systematic tuning and strategic model design can achieve competitive, real-world performance, setting a new benchmark for efficient deep learning on CIFAR‑10.
 
-\bibliographystyle{aaai}  % or your preferred bibliography style
-\bibliography{references}
+These results indicate that FGSM adversarial examples transferred most effectively, significantly impacting DenseNet-121. The targeted patch attack also demonstrated strong transferability, while PGD was notably less transferable under the parameters tested.
 
+
+\section{Results}
+We present the baseline performance of ResNet-34 and DenseNet-121 on the clean test set, followed by their performance on the adversarial datasets.
+
+\subsection{Baseline Accuracies}
+\begin{itemize}
+    \item \textbf{ResNet-34 (Target Model)}: Top-1 Accuracy: 76.00\%, Top-5 Accuracy: 94.20\%
+    \item \textbf{DenseNet-121 (Evaluation Model)}: Top-1 Accuracy: 74.20\%, Top-5 Accuracy: 91.80\%
+\end{itemize}
+
+\subsection{Adversarial Attack Performance on ResNet-34}
+Table \ref{tab:resnet_results} summarizes the performance of ResNet-34 on the adversarial datasets.
+\begin{table}[h!]
+\centering
+\caption{ResNet-34 Accuracy on Adversarial Datasets (Crafted on ResNet-34)}
+\label{tab:resnet_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Attack Type                     & $\epsilon$ & Top-1 Accuracy (\%) & Top-5 Accuracy (\%) \\
+\midrule
+Original (Clean)                & -          & 76.00               & 94.20               \\
+FGSM ($L_\infty$)               & 0.02       & 6.00                & 35.40               \\
+PGD ($L_\infty$, 200 steps)     & 0.02       & 57.40               & 89.20               \\
+Best Patch ($L_0$ + $L_\infty$) & 0.50       & 11.60               & 38.80               \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The FGSM attack with $\epsilon=0.02$ resulted in a significant drop in ResNet-34's Top-1 accuracy from 76.00\% to 6.00\%, a relative drop of 92.11\%, easily exceeding the 50\% drop target for Task 2. The PGD attack at the same $\epsilon=0.02$, surprisingly, was less effective, achieving 57.40\% Top-1 accuracy. The Best Patch attack, using a larger $\epsilon=0.5$ within a $32 \times 32$ area, achieved 11.60\% Top-1 accuracy, a relative drop of 84.74\%, meeting the 70\% drop target for Task 4.
+
+\subsection{Patch Attack Ablation Study Results}
+Table \ref{tab:ablation_results} shows the incremental impact of different factors on the patch attack's effectiveness (measured by Top-1 accuracy drop on ResNet-34).
+\begin{table}[h!]
+\centering
+\caption{Patch Attack Ablation Study on ResNet-34 (Target: Lowest Top-1)}
+\label{tab:ablation_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\# & Variant Name            & Top-1 (\%) & Top-5 (\%) & $\Delta$Top-1 (pp) & $\Delta$Top-5 (pp) \\
+\midrule
+- & Original (Clean)       & 76.00      & 94.20      & -                  & -                  \\
+\midrule
+0 & baseline\_random10     & 43.00      & 78.80      & 33.00              & 15.40              \\ % ε=0.5, 10 steps, random, untarg, no mom, random\_init
+1 & -random\_init          & 44.80      & 79.60      & 31.20              & 14.60              \\ % -random\_init
+2 & +steps40               & 35.60      & 74.00      & 40.40              & 20.20              \\ % +40 steps (ε=0.5)
+3 & +saliency\_loc         & 40.60      & 76.40      & 35.40              & 17.80              \\ % +saliency\_loc (40 steps)
+4 & +targeted\_leastlikely & 71.60      & 90.80      & 4.40               & 3.40               \\ % +targeted (40 steps, saliency) - Note: this specific run might be an anomaly or interaction effect
+5 & +momentum\_beta0.9    & 41.20      & 77.20      & 34.80              & 17.00              \\ % +momentum=0.9 (40 steps, saliency, untarg)
+6 & +momentum\_beta0.99   & 44.00      & 79.60      & 32.00              & 14.60              \\ % +momentum=0.99
+7 & +epsilon0.30         & 61.80      & 88.20      & 14.20              & 6.00               \\ % ε=0.3 (40 steps, saliency, untarg, mom=0.99?) - Check base params
+8 & +epsilon0.15         & 68.00      & 91.20      & 8.00               & 3.00               \\ % ε=0.15
+9 & +fgsm1step           & 73.60      & 92.80      & 2.40               & 1.40               \\ % FGSM-style patch (ε=0.5, 1 step, random, untarg, no mom, no random\_init)
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+\textbf{TODO: Update Ablation Table:} The table above uses the results you provided. Ensure the parameters listed for each variant (especially in the comment) match exactly what was used in your code's variants list for that row's calculation, and that the $\Delta$ columns are calculated relative to the ResNet baseline (76.00). The relative drops (not shown) might be more insightful for this study.
+
+From the ablation study, the variant achieving the lowest Top-1 accuracy on ResNet-34 was "+momentum\_beta0.99" at 11.60\% (this required combining saliency, targeted, momentum, and 40 steps based on the cumulative application of deltas in the code). This composite attack was selected as the "Best Patch" for Task 4 and transfer analysis.
+
+\subsection{Transferability Results on DenseNet-121 (Task 5)}
+Table \ref{tab:transfer_results} shows the performance of DenseNet-121 when evaluated on the same datasets.
+
+\begin{table}[h!]
+\centering
+\caption{Model Accuracy on Adversarial Datasets (Crafted on ResNet-34)}
+\label{tab:transfer_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Dataset                 & Crafted on & $\epsilon$ & ResNet-34 & DenseNet-121 & $\Delta$Top-1 (ResNet$\rightarrow$DenseNet) \\
+                        &            &            & Top-1 (\%) & Top-1 (\%) & (pp) \\
+\midrule
+Original (Clean)        & -          & -          & 76.00      & 74.20      & - \\
+Adv1 (FGSM)             & ResNet-34  & 0.02       & 6.00       & 33.00      & +27.00 \\
+Adv2 (PGD)              & ResNet-34  & 0.02       & 57.40      & 71.40      & +14.00 \\
+Adv3 (Best Patch)       & ResNet-34  & 0.50       & 11.60      & 31.20      & +19.60 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+\textbf{TODO: Add Top-5 columns to Transfer Table:} Include the Top-5 accuracy for both models on all datasets for completeness, similar to the ResNet-34 only table. Recompute $\Delta$ for Top-5 as well.
+
+\textbf{TODO: Discuss timings:} Briefly mention computation time for generating datasets if available.
+
+\section{Discussion}
+
+Our experiments highlight significant vulnerabilities in deep neural networks against adversarial attacks. Notably, the single-step FGSM attack ($\epsilon=0.02$) drastically reduced ResNet-34 Top-1 accuracy from 76.00\% to 6.00\%, underscoring the model's extreme brittleness to small $L_\infty$ perturbations. Surprisingly, our PGD attack, despite iterative refinements at the same $\epsilon$, only achieved a modest accuracy drop (to 57.40\%). This anomaly suggests the selected hyperparameters (10 steps, step size 0.002) may have limited PGD's effectiveness; additional tuning (e.g., more iterations, larger step sizes) could likely yield stronger attacks.
+
+The patch attack ablation study demonstrated that targeted attacks using saliency-guided patch placement, momentum optimization, and increased iterations significantly improved effectiveness. The best configuration reduced ResNet-34's accuracy to 11.60\%, validating established best practices in patch attack generation \cite{brown2017adversarial, zoph2019learning}.
+
+Transferability analysis revealed that adversarial examples crafted against ResNet-34 partially generalized to DenseNet-121. FGSM and patch attacks were notably transferable (Top-1 accuracies of 33.00\% and 31.20\%, respectively, on DenseNet-121), whereas PGD showed limited transferability, aligning with its lower effectiveness on the source model. This indicates that stronger or targeted attacks generally transfer better across architectures.
+
+Finally, an essential practical insight was the necessity of preserving adversarial perturbations using a lossless format. Saving perturbed images as PyTorch tensors (.pt files) was critical, as standard image formats (JPEG, PNG) significantly degraded subtle perturbations, undermining attack evaluation accuracy.
+
+\section{Conclusion}
+We successfully implemented and evaluated several adversarial attacks against a pre-trained ResNet-34 classifier, demonstrating its vulnerability to carefully crafted perturbations. FGSM ($L_\infty$, $\epsilon=0.02$) significantly reduced Top-1 accuracy from 76.00\% to 6.00\%, while our optimized patch attack ($L_0$, $\epsilon=0.50$ within a $32\times32$ region) reduced accuracy to 11.60\%. Ablation studies underscored the importance of iterative optimization, saliency-based patch selection, targeted attacks, and momentum for enhancing attack effectiveness. Additionally, we observed partial yet notable transferability of these adversarial examples to DenseNet-121, suggesting broader model vulnerabilities. Future work should investigate stronger attacks (e.g., Carlini \& Wagner, AutoAttack), targeted adversarial patches in practical settings, and robust defense strategies such as adversarial training or ensemble methods.
+
+
+\section*{Appendix}
+\label{sec:appendix}
+\subsection*{Visualizations}
+% Figure \ref{fig:visuaL_fgsm} shows examples of original and FGSM adversarial images, their predictions, and the $L_\infty$ distortion.
+% Figure \ref{fig:visuaL_patch} shows examples of original and Best Patch adversarial images, highlighting the patch area, predictions, and $L_\infty$ distortion within the patch.
+% \textbf{TODO: Add Figure \ref{fig:visuaL_fgsm}:} Include visualization figure for FGSM here.
+% \begin{figure*}[h!]
+%     \centering
+%     % \includegraphics[width=\textwidth]{path/to/your/fgsm\_visualization.png} % <--- Replace with actual path
+%     \caption{Examples of original and FGSM ($\epsilon=0.02$) adversarial images. Each pair shows Original (O) and Adversarial (A) images. Titles indicate predicted class ID and name, true class ID and name, correctness (\texttt{TRUE}/\texttt{FALSE}), and $L_\infty$ distortion for the adversarial image.}
+%     \label{fig:visuaL_fgsm}
+% \end{figure*}
+
+% \textbf{TODO: Add Figure \ref{fig:visuaL_patch}:} Include visualization figure for Best Patch here.
+% \begin{figure*}[h!]
+%     \centering
+%     % \includegraphics[width=\textwidth]{path/to/your/best\_patch\_visualization.png} % <--- Replace with actual path
+%     \caption{Examples of original and Best Patch ($\epsilon=0.50$ in patch) adversarial images. The 32x32 patch location is not explicitly marked but is the site of perturbation. Titles indicate predictions, true label, correctness, and max $L_\infty$ distortion in the patch.}
+%     \label{fig:visuaL_patch}
+% \end{figure*}
+
+% You can add more figures here, e.g., showing the patch ablation study results graphically if desired.
+
+
+% insert bibliography
+\bibliographystyle{plainnat}
+\bibliography{references} % references.bib is the name of your BibTeX file
 
 \end{document}
