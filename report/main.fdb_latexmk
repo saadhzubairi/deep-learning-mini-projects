@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1755230491.0174 "main.aux" "main.bbl" "main" 1755230494.29935 0
-  "./aaai.bst" 1755230133 21724 594633d66e7fc3a1f47e8092b0bafed8 ""
-  "./references.bib" 1755230133 5418 850be7bb9e7a8dca704146e31f42c1fc ""
-  "main.aux" 1755230493 5396 5c19a68bda460a24c0cb906be3d928cd "pdflatex"
+["bibtex main"] 1755231044.38084 "main.aux" "main.bbl" "main" 1755231112.2608 0
+  "./aaai.bst" 1755230138 21724 594633d66e7fc3a1f47e8092b0bafed8 ""
+  "./references.bib" 1755231038 5537 850be7bb9e7a8dca704146e31f42c1fc ""
+  "main.aux" 1755231111 5396 5c19a68bda460a24c0cb906be3d928cd "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1755230491.50687 "c:/Users/saadh/OneDrive/Desktop/ece-gy-7143-deeplearning-main/deep-learning/report/main.tex" "main.pdf" "main" 1755230494.30012 0
+["pdflatex"] 1755231109.10808 "c:/Users/saadh/OneDrive/Desktop/ece-gy-7143-deeplearning-main/deep-learning/report/main.tex" "main.pdf" "main" 1755231112.26154 0
   "C:/Users/saadh/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1747106683 279613 fe62a258ff6d99cc2243c3a2d16aa767 ""
   "C:/Users/saadh/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1728863244 11948198 ca20065b1365ec4de8c56ca0ac479473 ""
   "C:/Users/saadh/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -155,17 +155,17 @@
   "C:/Users/saadh/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1657800696 9714 ba3194bd52c8499b3f1e3eb91d409670 ""
   "C:/Users/saadh/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/saadh/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "aaai.sty" 1755230133 13168 e3f16e6ec62da2fbaf7713825b0c4d7a ""
-  "c:/Users/saadh/OneDrive/Desktop/ece-gy-7143-deeplearning-main/deep-learning/report/main.tex" 1755230133 18724 0ba35b1f24fc034ad194ea45391b8489 ""
-  "images/accuracy_charts.png" 1755230133 20874 5beca7378c8859e66a67d417e15caa29 ""
-  "images/conf_matrix.png" 1755230133 58459 bd32d6d56aa056b27e5d3fe18f450bb1 ""
-  "images/train_test_loss_94.62.png" 1755230133 41173 4c9c08ef241a412803b3f183dd83464c ""
-  "images/train_test_loss_95.31.png" 1755230133 42633 4ea71e64f5cb79f77ed5546e90787676 ""
-  "images/traintest_lost-88.25.png" 1755230133 34067 052625eaf83457dd68663b67fb269693 ""
-  "main.aux" 1755230493 5396 5c19a68bda460a24c0cb906be3d928cd "pdflatex"
-  "main.bbl" 1755230491 3586 e3400e77d9b671f243de8f4819bec5f9 "bibtex main"
-  "main.out" 1755230493 2148 0adedbf3b51f4fb67ad15d8ea857501a "pdflatex"
-  "main.tex" 1755230133 18724 0ba35b1f24fc034ad194ea45391b8489 ""
+  "aaai.sty" 1755230138 13168 e3f16e6ec62da2fbaf7713825b0c4d7a ""
+  "c:/Users/saadh/OneDrive/Desktop/ece-gy-7143-deeplearning-main/deep-learning/report/main.tex" 1755231108 18859 a5b5c3b4e0da43b1a339811c92b42f28 ""
+  "images/accuracy_charts.png" 1755231038 20874 5beca7378c8859e66a67d417e15caa29 ""
+  "images/conf_matrix.png" 1755231038 58459 bd32d6d56aa056b27e5d3fe18f450bb1 ""
+  "images/train_test_loss_94.62.png" 1755231038 41173 4c9c08ef241a412803b3f183dd83464c ""
+  "images/train_test_loss_95.31.png" 1755231038 42633 4ea71e64f5cb79f77ed5546e90787676 ""
+  "images/traintest_lost-88.25.png" 1755231038 34067 052625eaf83457dd68663b67fb269693 ""
+  "main.aux" 1755231111 5396 5c19a68bda460a24c0cb906be3d928cd "pdflatex"
+  "main.bbl" 1755231044 3586 e3400e77d9b671f243de8f4819bec5f9 "bibtex main"
+  "main.out" 1755231111 2148 0adedbf3b51f4fb67ad15d8ea857501a "pdflatex"
+  "main.tex" 1755231108 18859 a5b5c3b4e0da43b1a339811c92b42f28 ""
   (generated)
   "main.aux"
   "main.log"
